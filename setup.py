@@ -18,6 +18,8 @@ setuptools.setup(
         "datasets",
         "loguru",
         "torch",
+        "torchaudio",
+        "tqdm",
         "ukro-g2p"
     ]
 )
