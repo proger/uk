@@ -1,6 +1,4 @@
-' EH IY B
-'іде IY1 D EIH
-а CH AA1
+а AA1
 абдулу AA B D UH1 L UH
 абетковий AA B EH1 T K AO V IH Y
 абетці AA B EH1 TSJ3 IY
@@ -485,7 +483,7 @@
 ацест AA TS EH1 S T
 ацтекської AA TS T EH1 K SJ K AO Y IY
 аякси AA1 Y AA K S IHE
-б B UH Y
+б B
 б'юкенен B Y UH1 K EIH N EIH N
 б'юсь B Y UH SJ
 б'ють B Y UH TJ
@@ -1574,7 +1572,7 @@
 бісом B2 IY1 S AO M
 бісів B2 IY1 SJ IY WH
 бісівських B2 IY SJ IY1 WH SJ K IHE X
-в EH AA B
+в V
 в'ються V Y UH1 TSJ3 AA
 в'язали V Y AA Z AA1 L IHE
 в'язання V Y AA Z AA1 NJ3 AA
@@ -5740,7 +5738,7 @@
 гітарі H2 IY T AA1 RJ IY
 гітлер H2 IY1 T L EIH R
 гітлерова H2 IY1 T L EIH R AO V AA
-д EH IH D
+д D
 д'аламбер D AA L AA M B EH1 R
 да D AA
 дав D AA WH
@@ -7214,7 +7212,7 @@
 дієтолога DJ IY Y EIH T AO1 L AO H AA
 діється DJ IY1 Y EIY TSJ3 AA
 дії DJ IY1 Y IY
-е EH IY1 B UH
+е EH1
 евакуацію EIH V AA K UH AA1 TSJ IY Y UH
 евакуації EIH V AA K UH AA1 TSJ IY Y IY
 евакуюється EIH V AA K UH Y UH1 Y EIY TSJ3 AA
@@ -7396,7 +7394,7 @@
 ецій EH1 TSJ IY Y
 еція EH1 TSJ IY Y AA
 ешелон EIH SH EIH L AO1 N
-ж EH IY ZH
+ж ZH
 жаба ZH AA1 B AA
 жаби ZH AA1 B IHE
 жаботин ZH AA1 B AO T IHE N
@@ -7651,7 +7649,7 @@
 жіночу ZH2 IY1 N AO CH UH
 жінці ZH2 IY1 NJ TSJ IY
 жінчиних ZH2 IY1 N CH IHE N IHE X
-з EH IH Z
+з Z
 з'явився Z Y AA V IH1 WH SJ AA
 з'явившись Z Y AA V IH1 WH SH IHE SJ
 з'явилась Z Y AA V IH1 L AA SJ
@@ -10348,14 +10346,14 @@
 зґвалтував Z G V AA L T UH V AA1 WH
 зґвалтування Z G V AA L T UH V AA1 NJ3 AA
 зґвалтуванням Z G V AA L T UH V AA1 NJ3 AA M
-и LJ IY1 B IHE
+и IY1
 иере EH1 EIH R IHE
 инче IH1 N CH EIH
 инчих IHE N CH IH1 X
 инчого IY N CH AO1 H AO
 инчі IY N CH2 IY1
 инша IH1 N SH AA
-й LJ IH Y
+й Y
 йде Y D EH
 йдемо Y D EIH M AO1
 йдете Y D EH1 T EIH
@@ -10401,7 +10399,7 @@
 йшли Y SH L IH
 йшло Y SH L AO
 йшов Y SH AO WH
-к EH IY K
+к K
 кабаку K AA B AA1 K UH
 кабальєро K AA B AA LJ Y EH1 R AO
 кабан K AA B AA1 N
@@ -12961,7 +12959,7 @@
 ліцензію LJ IY TS EH1 N ZJ IY Y UH
 ліцею LJ IY1 TS EIH Y UH
 лічені LJ IY1 CH EIH NJ IY
-м EH IY M
+м M
 м'ютекса M Y UH1 T EIH K S AA
 м'яз M Y AA Z
 м'язами M Y AA1 Z AA M IHE
@@ -14270,7 +14268,7 @@
 мішури M2 IY SH UH R IH1
 міщанська M2 IY SH CH AA1 N SJ K AA
 міядзакі M2 IY Y AA DZ AA1 K2 IY
-н EH IY N
+н N
 на N AA
 набагато N AA B AA H AA1 T AO
 набивши N AA B IH1 WH SH IHE
@@ -15985,7 +15983,7 @@
 ніякой NJ IY Y AA K AO1 Y
 ніякої NJ IY Y AA1 K AO Y IY
 ніякім NJ IY Y AA K2 IY1 M
-о AO Y UH1
+о AO
 о'брайен AO B R AA1 Y EIH N
 о'лірі AO LJ IY RJ IY1
 об AO B
@@ -17225,7 +17223,7 @@
 очіпок AOU CH2 IY1 P AO K
 ошалілого AO SH AA LJ IY1 L AO H AO
 ошелешена AO SH EIH L EH1 SH EIH N AA
-п EH IY P L
+п P
 п'ю P Y UH
 п'яді P Y AA1 DJ IY
 п'яна P Y AA1 N AA
@@ -22086,7 +22084,7 @@
 піщаному P2 IY SH CH AA1 N AO M UH
 піють P2 IY1 Y UH TJ
 пієтет P2 IY Y EIH T EH1 T
-р EH IY R
+р R
 раб R AA B
 раба R AA1 B AA
 раби R AA1 B IHE
@@ -23501,7 +23499,7 @@
 рішучі RJ IY1 SH UH CH2 IY
 ріщі RJ IY1 SH CH2 IY
 рієлторів RJ IY Y EH1 L T AO RJ IY WH
-с EH IY S T
+с S
 саботажник S AA B AO T AA1 ZH N IHE K
 савроматська S AA WH R AO M AA1 TSJ K AA
 савченко S AA1 WH CH EIH N K AO
@@ -26200,7 +26198,7 @@
 сіятись SJ IY1 Y AA T IHE SJ
 сією SJ IY1 Y EIY Y UH
 сієї SJ IY1 Y EIY Y IY
-т EH IH T
+т T
 т'єрі T Y EH1 RJ IY
 та T AA
 таблиць T AA B L IH1 TSJ
@@ -27159,7 +27157,7 @@
 тішиться TJ IY1 SH IHE TSJ3 AA
 тією TJ IY1 Y EIY Y UH
 тієї TJ IY1 Y EIY Y IY
-у CH UH
+у UH
 убив UH B IH1 WH
 убивства UH B IH1 WH S T V AA
 убивць UH B IH1 WH TSJ
@@ -27685,7 +27683,7 @@
 уявляємо UH Y AA WH LJ AA1 Y EIH M AO
 уявного UH Y AA1 WH N AO H AO
 уяву UH Y AA1 V UH
-ф EH IY F
+ф F
 ф'южн F Y UH ZH N
 ф'ючерсами F Y UH1 CH EIH R S AA M IHE
 ф'ючерсів F Y UH1 T EIH R SJ IY WH
@@ -27948,7 +27946,7 @@
 фіст F2 IY S T
 фіцджеральд F2 IY TS JH EIH R AA1 LJ D
 фішка F2 IY1 SH K AA
-х CH IH X
+х CH
 ха X AA
 хабаровську X AA B AA R AO1 WH SJ K UH
 хабарі X AA B AA RJ IY1
@@ -29633,7 +29631,7 @@
 юста Y UH1 S T AA
 юхим Y UH X IH1 M
 ющенко Y UH1 SH CH EIH N K AO
-я CH2 AA1 Y UH
+я Y AA1
 ябедник Y AA1 B EIH D N IHE K
 ябедництва Y AA1 B EIH D N IHE TS T V AA
 яблочка Y AA1 B L AO CH K AA
@@ -29798,7 +29796,7 @@
 ящірко Y AA1 SH CH2 IY R K AO
 яєць Y AA1 Y EIY TSJ
 яєчня Y AA Y EH1 CH NJ AA
-є CH2 IY1 Y UH
+є Y EH1
 євгене Y EIH WH H EH1 N EIH
 євнух Y EH1 WH N UH X
 євнуха Y EH1 WH N UH X AA
@@ -29871,7 +29869,7 @@
 єсть Y EIY SJ TJ
 єутихій Y UH EH1 T IHE X2 IY Y
 єхидно Y EIH X IH1 D N AO
-і CH2 IY1 Y UH
+і IY1
 івака IY V AA1 K AA
 іван IY V AA1 N
 івана IY V AA1 N AA
@@ -30281,7 +30279,7 @@
 їхніми Y IY1 X NJ IY M IHE
 їхніх Y IY1 X NJ IY X
 її Y IY1 Y IY
-ґ EH IY B
+ґ G
 ґава G AA1 V AA
 ґазда G AA1 Z D AA
 ґаздинь G AA Z D IH1 NJ
