@@ -1,7 +1,10 @@
 # Вирівняти Семесюка
 
-This recipe trains a GMM-HMM Ukrainian model on Common Voice 8.0 to use for force alignment of audio books.
-It supports custom vocabularies.
+This recipe trains a Ukrainian GMM-HMM on Common Voice 8.0 to use
+for segmentation of long audio files into short utterances using its full transcript.
+
+It avoids performing full large vocabulary speech recognition
+by limiting its search options to word sequences from the input transcript.
 
 ## Recipe
 
