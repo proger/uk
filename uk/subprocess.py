@@ -1,4 +1,4 @@
-from functools import wraps
+from functools import wraps, reduce
 import time
 import subprocess
 
@@ -34,3 +34,8 @@ def check_output(cmd, *args, **kwargs):
     finally:
         t = time.time() - t0
         logger.info('{} took {}', x, t)
+
+
+def sh(x, *args, **kwargs):
+    dash_dash = [[f"--{kw.replace('_', '-')}", str(kwargs[kw])] for kw in kwargs]
+    return run([x] + reduce(list.__add__, dash_dash, [])  + [str(arg) for arg in args])

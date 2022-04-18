@@ -31,10 +31,10 @@ conflate_phones() {
 }
 
 # Phone alphabet
-cut -s -f2- $dir/lexicon_common_voice_uk.txt | tr ' ' '\n' | conflate_phones | sort -u > $dir/nonsilence_phones.txt
+cut -d' ' -f2- $dir/lexicon_common_voice_uk.txt | tr ' ' '\n' | conflate_phones | sort -u | tee $dir/nonsilence_phones.txt
 
 # Base lexicon
-cut -s -f1- $dir/lexicon_common_voice_uk.txt | sort -u > $dir/lexicon1_raw_nosil.txt
+cut -d' ' -f1- $dir/lexicon_common_voice_uk.txt | sort -u > $dir/lexicon1_raw_nosil.txt
 
 # Add prons for silence_phones
 for w in `grep -v sil $dir/silence_phones.txt`; do
