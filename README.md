@@ -31,6 +31,7 @@ export HF_AUTH_TOKEN=hf_yolo
 . path.sh
 
 # prepare dataset for training
+# FWIW downloading takes longer than training :)
 python3 -m uk.common_voice
 
 # progressively train mono, tri, tri2b, tri3b models
