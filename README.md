@@ -39,7 +39,7 @@ python3 -m uk.train_gmm
 
 ### Segment Parallel Speech and Text Data
 
-```
+```bash
 # get data to align
 git clone https://github.com/lang-uk/semesyuk-to-text
 
