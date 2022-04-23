@@ -17,6 +17,7 @@ g2p_base = G2P('ukro-base-uncased')
 replacements = {
     'SH23': 'SH2',
     'H3': 'H',
+    'M3': 'M',
 }
 
 def g2p(word):
