@@ -11,3 +11,5 @@ data/local/dict/lexicon4_extra.txt
 data/local/dict/nonsilence_phones.txt
 data/local/dict/optional_silence.txt
 data/local/dict/silence_phones.txt
+exp/
+wandb/
