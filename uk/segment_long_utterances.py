@@ -59,12 +59,13 @@ def extend_dict(words: List[str], dict_dir: Path, source_dict_dir: Path = args.d
         for word in oov:
             print(word, oov[word].strip(), file=f)
 
-if stage <= -1:
+if stage <= -3:
     words = args.corpus_txt.read_text().split()
     extend_dict(words, dict_dir)
 
     sh('utils/prepare_lang.sh', '--unk-fst', args.unk_fst, dict_dir, "<unk>", args.work_dir / 'lang_tmp', langdir)
 
+if stage <= -2:
     with open(datadir / 'text', 'w') as f:
         print(args.mp3.stem, ' '.join(words), file=f)
 
@@ -77,6 +78,7 @@ if stage <= -1:
     with open(datadir / 'spk2utt', 'w') as f:
         print(args.mp3.stem, args.mp3.stem, file=f)
 
+if stage <= -1:
     sh('steps/make_mfcc.sh', datadir, mfcc_config='conf/mfcc.conf', nj=1)
     sh('steps/compute_cmvn_stats.sh', datadir)
 
