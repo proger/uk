@@ -105,16 +105,16 @@ if stage <= 14:
         )
 
 if stage <= 16:
-    # extract alignments
-    sh('steps/compute_cmvn_stats.sh', args.work_dir / 'resegmented')
-    sh('steps/align_fmllr.sh', args.work_dir / 'resegmented', langdir, args.model_dir, args.work_dir / 'ali')
-
-if stage <= 17:
     # redefine wav.scp to use fullband wav instead
     with open(args.work_dir / 'resegmented' / 'wav.scp', 'w') as f:
         print(args.mp3.stem, 'ffmpeg -nostdin -i', args.mp3.absolute(), '-ac 1 -acodec pcm_s16le -f wav - |', file=f)
 
     sh('utils/data/extract_wav_segments_data_dir.sh',  args.work_dir / 'resegmented', args.output_dir)
+
+if stage <= 17:
+    # extract alignments
+    sh('steps/compute_cmvn_stats.sh', args.work_dir / 'resegmented')
+    sh('steps/align_fmllr.sh', args.work_dir / 'resegmented', langdir, args.model_dir, args.work_dir / 'ali')
 
 if stage <= 18:
     #
