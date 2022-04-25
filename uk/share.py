@@ -43,7 +43,7 @@ def datadir_to_artifact(datadir: Path):
             audio = wandb.Audio(array, sample_rate=sample_rate)
             row = [utt_id, audio, text[utt_id]]
             if phones:
-                row.extend([phones[utt_id], phone_durations[utt_id]])
+                row.extend([phones.get(utt_id, ''), phone_durations.get(utt_id, '')])
             table.add_data(*row)
 
     artifact = wandb.Artifact(datadir.stem, type="dataset")
