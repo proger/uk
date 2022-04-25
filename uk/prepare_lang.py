@@ -18,11 +18,11 @@ def extend_dict(words: List[str], dict_dir: Path, source_dict_dir: Path):
     shutil.copy(source_dict_dir / 'nonsilence_phones.txt', dict_dir / 'nonsilence_phones.txt')
 
     with open(dict_dir / 'lexicon.txt', 'w') as f:
-        oov = {}
-        for word in words:
-            oov[word] = ' '.join(g2p(word))
-
         with open(source_dict_dir / 'lexicon.txt') as lexicon:
+            oov = {}
+            for word in words:
+                oov[word] = ' '.join(g2p(word))
+
             for line in lexicon:
                 word, prons = line.split(maxsplit=1)
                 print(word, prons.strip(), file=f)
