@@ -6,12 +6,11 @@ import argparse
 import os
 from pathlib import Path
 import shutil
-from typing import List
 
 from loguru import logger
 
-from uk.g2p import g2p
 from uk.subprocess import sh, check_output
+from uk.prepare_lang import extend_dict
 
 parser = argparse.ArgumentParser(description="""\
 python3 -m uk.segment_long_utterances -w exp/corpus -o data/semesyuk_farshrutka_prologue data/local/semesyuk_farshrutka/01_prologue.txt semesyuk-to-text/audio/raw/semesyuk_farshrutka/01_prologue.mp3
@@ -38,30 +37,9 @@ datadir.mkdir(exist_ok=True, parents=True)
 langdir = args.work_dir / 'lang'
 
 
-def extend_dict(words: List[str], dict_dir: Path, source_dict_dir: Path = args.dict_dir):
-    shutil.copy(source_dict_dir / 'extra_questions.txt', dict_dir / 'extra_questions.txt')
-    shutil.copy(source_dict_dir / 'optional_silence.txt', dict_dir / 'optional_silence.txt')
-    shutil.copy(source_dict_dir / 'silence_phones.txt', dict_dir / 'silence_phones.txt')
-    shutil.copy(source_dict_dir / 'nonsilence_phones.txt', dict_dir / 'nonsilence_phones.txt')
-
-    with open(dict_dir / 'lexicon.txt', 'w') as f:
-        oov = {}
-        for word in words:
-            oov[word] = ' '.join(g2p(word))
-
-        with open(source_dict_dir / 'lexicon.txt') as lexicon:
-            for line in lexicon:
-                word, prons = line.split(maxsplit=1)
-                print(word, prons.strip(), file=f)
-                if word in oov:
-                    del oov[word]
-
-        for word in oov:
-            print(word, oov[word].strip(), file=f)
-
 if stage <= -3:
     words = args.corpus_txt.read_text().split()
-    extend_dict(words, dict_dir)
+    extend_dict(words, dict_dir, args.dict_dir)
 
     sh('utils/prepare_lang.sh', '--unk-fst', args.unk_fst, dict_dir, "<unk>", args.work_dir / 'lang_tmp', langdir)
 
