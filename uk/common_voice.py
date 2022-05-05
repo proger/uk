@@ -42,7 +42,7 @@ def prepare(dataset, datadir, g2p=None):
         if g2p is not None:
             lexicon_txt = stack.enter_context(open(datadir / 'lexicon.txt', 'w'))
 
-        for sample in tqdm(sorted(dataset, key=lambda sample: Path(sample['path']).stem)):
+        for sample in tqdm(dataset):
             path = Path(sample['path'])
             loc = (datadir / 'wav' / path.name).with_suffix('.wav')
             sentence = keep_useful_characters(sample['sentence'])
