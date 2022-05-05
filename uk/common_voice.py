@@ -28,7 +28,7 @@ def keep_useful_characters(s, alphabet='cyr'):
 
 
 def prepare(dataset, datadir, g2p=None):
-    datadir.mkdir(exist_ok=True)
+    datadir.mkdir(exist_ok=True, parents=True)
     (datadir / 'wav').mkdir(exist_ok=True)
 
     with ExitStack() as stack:
@@ -38,6 +38,7 @@ def prepare(dataset, datadir, g2p=None):
         wavscp = stack.enter_context(open(datadir / 'wav.scp', 'w'))
 
         lexicon = {}
+        words_txt = stack.enter_context(open(datadir / 'words.txt', 'w'))
         if g2p is not None:
             lexicon_txt = stack.enter_context(open(datadir / 'lexicon.txt', 'w'))
 
@@ -51,15 +52,20 @@ def prepare(dataset, datadir, g2p=None):
             torchaudio.save(loc, torch.from_numpy(sample['audio']['array'])[None, :], 48000, bits_per_sample=16, encoding='PCM_S')
             print(path.stem, 'sox', str(loc), '-r 16k -t wav -c 1 - |', file=wavscp)
 
-            if g2p is not None:
-                words = sentence.split()
-                for word in words:
-                    if not word in lexicon:
-                        if pron := g2p(word):
-                            lexicon[word] = ' '.join(pron)
+            words = sentence.split()
+            for word in words:
+                if not word in lexicon:
+                    lexicon[word] = None
+
+        if g2p is not None:
+            for word in lexicon:
+                if pron := g2p(word):
+                    lexicon[word] = ' '.join(pron)
 
         for word in sorted(lexicon):
-            print(word, lexicon[word], file=lexicon_txt)
+            if lexicon[word]:
+                print(word, lexicon[word], file=lexicon_txt)
+            print(word, file=words_txt)
 
 
 if __name__ == '__main__':
