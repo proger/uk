@@ -19,9 +19,11 @@ def keep_useful_characters(s, alphabet='cyr'):
     if alphabet == 'cyr':
         s = re.sub(r'[^ыёэъЫЁЭЪйцукенгшщзхїфивапролджєґячсміiтьбюЙЦУКЕНГШЩЗХЇФИВАПРОЛДЖЄҐЯЧСМІТЬБЮ\' -]', '', s)
     else:
-        s = re.sub(r'[^йцукенгшщзхїфивапролджєґячсміiтьбюЙЦУКЕНГШЩЗХЇФИВАПРОЛДЖЄҐЯЧСМІТЬБЮ\' -]', '', s)
+        s =         re.sub(r'[^йцукенгшщзхїфивапролджєґячсміiтьбюЙЦУКЕНГШЩЗХЇФИВАПРОЛДЖЄҐЯЧСМІТЬБЮ\' -]', '', s)
     s = re.sub(r'[ -]+', ' ', s)
     s = re.sub(r'\s+', ' ', s) # unicode whitespace
+    s = re.sub(r'^\'+', '', s) # leading apostrophes
+    s = re.sub(r'\'+$', '', s) # trailing apostrophes
     s = s.replace('i','і')
     s = s.strip()
     return s
