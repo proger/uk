@@ -79,17 +79,16 @@ and export a token from https://huggingface.co/settings/tokens as HF_AUTH_TOKEN
 
     import argparse
     parser = argparse.ArgumentParser(__file__, description='prepare kaldi data directory with common voice data')
-    parser.add_argument('--test', action='store_true', help='generate test split')
     parser.add_argument('--lexicon', action='store_true', help='generate lexicon for every word using ukro-g2p')
     parser.add_argument('--lang', default='uk', help='language code')
     parser.add_argument('--root', type=Path, default=Path('data/cv'), help='where to put test or train datadirs')
+    parser.add_argument('--split', type=str, default='train', help='split to generate (train, validation, test, etc)')
 
     args = parser.parse_args()
 
-    split = 'test' if args.test else 'train+validation'
-    datadir = args.root / 'test' if args.test else args.root / 'train'
+    datadir = args.root / args.split
 
-    uk = datasets.load_dataset('mozilla-foundation/common_voice_9_0', args.lang, split=split, use_auth_token=auth_token)
+    uk = datasets.load_dataset('mozilla-foundation/common_voice_9_0', args.lang, split=args.split, use_auth_token=auth_token)
     #
     # or just use an older dataset version (untested):
     #
