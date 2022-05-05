@@ -13,10 +13,13 @@ import torchaudio
 from tqdm import tqdm
 
 
-def keep_useful_characters(s):
+def keep_useful_characters(s, alphabet='cyr'):
     s = s.lower()
     s = s.replace('’', "'")
-    s = re.sub(r'[^йцукенгшщзхїфивапролджєґячсміiтьбюЙЦУКЕНГШЩЗХЇФИВАПРОЛДЖЄҐЯЧСМІТЬБЮ\' -]', '', s)
+    if alphabet == 'cyr':
+        s = re.sub(r'[^ыёэъЫЁЭЪйцукенгшщзхїфивапролджєґячсміiтьбюЙЦУКЕНГШЩЗХЇФИВАПРОЛДЖЄҐЯЧСМІТЬБЮ\' -]', '', s)
+    else:
+        s = re.sub(r'[^йцукенгшщзхїфивапролджєґячсміiтьбюЙЦУКЕНГШЩЗХЇФИВАПРОЛДЖЄҐЯЧСМІТЬБЮ\' -]', '', s)
     s = re.sub(r'[ -]+', ' ', s)
     s = re.sub(r'\s+', ' ', s) # unicode whitespace
     s = s.replace('i','і')
@@ -52,7 +55,8 @@ def prepare(dataset, datadir, g2p=None):
                 words = sentence.split()
                 for word in words:
                     if not word in lexicon:
-                        lexicon[word] = ' '.join(g2p(word))
+                        if pron := g2p(word):
+                            lexicon[word] = ' '.join(pron)
 
         for word in sorted(lexicon):
             print(word, lexicon[word], file=lexicon_txt)
@@ -63,7 +67,7 @@ if __name__ == '__main__':
         auth_token = os.environ.get('HF_AUTH_TOKEN')
     except KeyError as e:
         raise Exception("""\
-    Share your contacts at https://huggingface.co/datasets/mozilla-foundation/common_voice_8_0
+    Share your contacts at https://huggingface.co/datasets/mozilla-foundation/common_voice_9_0
     and export a token from https://huggingface.co/settings/tokens as HF_AUTH_TOKEN
     """) from e
 
@@ -71,17 +75,19 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(__file__, description='prepare kaldi data directory with common voice data')
     parser.add_argument('--test', action='store_true', help='generate test split')
     parser.add_argument('--lexicon', action='store_true', help='generate lexicon for every word using ukro-g2p')
+    parser.add_argument('--lang', default='uk', help='language code')
+    parser.add_argument('--root', default=Path('data/cv'), help='where to put test or train datadirs')
 
     args = parser.parse_args()
 
     split = 'test' if args.test else 'train+validation'
-    datadir = Path('data/cv_test') if args.test else Path('data/cv_train')
+    datadir = args.root / 'test' if args.test else args.root / 'train'
 
-    uk = datasets.load_dataset('mozilla-foundation/common_voice_8_0', 'uk', split=split, use_auth_token=auth_token)
+    uk = datasets.load_dataset('mozilla-foundation/common_voice_9_0', args.lang, split=split, use_auth_token=auth_token)
     #
     # or just use an older dataset version (untested):
     #
-    #uk = datasets.load_dataset('common_voice', 'uk', split='train+validation')
+    #uk = datasets.load_dataset('common_voice', args.lang, split='train+validation')
     #
 
     if args.lexicon:
