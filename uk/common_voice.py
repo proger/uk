@@ -76,7 +76,7 @@ if __name__ == '__main__':
     parser.add_argument('--test', action='store_true', help='generate test split')
     parser.add_argument('--lexicon', action='store_true', help='generate lexicon for every word using ukro-g2p')
     parser.add_argument('--lang', default='uk', help='language code')
-    parser.add_argument('--root', default=Path('data/cv'), help='where to put test or train datadirs')
+    parser.add_argument('--root', type=Path, default=Path('data/cv'), help='where to put test or train datadirs')
 
     args = parser.parse_args()
 
