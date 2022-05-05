@@ -29,6 +29,10 @@ def keep_useful_characters(s, alphabet='cyr'):
     return s
 
 
+def tokens(s):
+    return s.split()
+
+
 def prepare(dataset, datadir, g2p=None):
     datadir.mkdir(exist_ok=True, parents=True)
     (datadir / 'wav').mkdir(exist_ok=True)
@@ -48,13 +52,13 @@ def prepare(dataset, datadir, g2p=None):
             path = Path(sample['path'])
             loc = (datadir / 'wav' / path.name).with_suffix('.wav')
             sentence = keep_useful_characters(sample['sentence'])
-            print(path.stem, sentence, file=text)
+            words = [keep_useful_characters(t) for t in tokens(sentence)]
+            print(path.stem, *words, file=text)
             print(path.stem, path.stem, file=utt2spk)
             print(path.stem, path.stem, file=spk2utt)
             torchaudio.save(loc, torch.from_numpy(sample['audio']['array'])[None, :], 48000, bits_per_sample=16, encoding='PCM_S')
             print(path.stem, 'sox', str(loc), '-r 16k -t wav -c 1 - |', file=wavscp)
 
-            words = sentence.split()
             for word in words:
                 if not word in lexicon:
                     lexicon[word] = None
