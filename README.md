@@ -1,6 +1,6 @@
-# Вирівняти Семесюка
+# Вирівняти довгі аудіо та тексти українською
 
-This recipe trains a Ukrainian GMM-HMM on Common Voice 8.0 to use
+This recipe trains a Ukrainian GMM-HMM on Common Voice 9.0 to use
 for segmentation of long audio files into short utterances using its full transcript.
 
 It avoids performing full large vocabulary speech recognition
@@ -19,7 +19,7 @@ git clone https://github.com/kaldi-asr/kaldi
 
 Prerequisites:
 
-- Share contact information at https://huggingface.co/datasets/mozilla-foundation/common_voice_8_0
+- Request access at https://huggingface.co/datasets/mozilla-foundation/common_voice_9_0
 - Get a Hugging Face token at https://huggingface.co/settings/tokens
 
 ```bash
@@ -40,7 +40,7 @@ python3 -m uk.train_gmm
 ### Segment Parallel Speech and Text Data
 
 ```bash
-# get data to align
+# get example data to align
 git clone https://github.com/lang-uk/semesyuk-to-text
 
 # note: text can contain extra words
