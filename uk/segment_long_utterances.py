@@ -15,7 +15,7 @@ from uk.prepare_lang import extend_dict
 
 parser = argparse.ArgumentParser(description="""\
 python3 -m uk.segment_long_utterances -w exp/corpus -o data/semesyuk_farshrutka_prologue data/local/semesyuk_farshrutka/01_prologue.txt semesyuk-to-text/audio/raw/semesyuk_farshrutka/01_prologue.mp3
-""")
+""", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('-w', '--work-dir', type=Path, required=True)
 parser.add_argument('-d', '--dict-dir', type=Path, default='data/local/dict')
 parser.add_argument('-u', '--unk-fst', type=Path, default='exp/make_unk/unk_fst.txt')

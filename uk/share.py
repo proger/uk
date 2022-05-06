@@ -53,7 +53,7 @@ def datadir_to_artifact(datadir: Path):
 
 if __name__ == '__main__':
     import argparse
-    parser = argparse.ArgumentParser('upload kaldi data to wandb with an index Table')
+    parser = argparse.ArgumentParser('upload kaldi data to wandb with an index Table', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('datadir', type=Path, help='kaldi data directory')
     args = parser.parse_args()
 

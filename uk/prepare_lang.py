@@ -38,7 +38,7 @@ if __name__ == '__main__':
     Prepare a langdir and dictionary given a corpus
 
     python3 -m uk.prepare_lang -w exp/lang -o data/lang data/local/semesyuk_farshrutka/01_prologue.txt
-    """)
+    """, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-o', '--output-dir', type=Path, required=True)
     parser.add_argument('-d', '--dict-dir', type=Path, default='data/local/dict', help='source dictionary')
     parser.add_argument('corpus_txt', type=Path, help='must be tokenized (see README)')

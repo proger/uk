@@ -84,7 +84,8 @@ and export a token from https://huggingface.co/settings/tokens as HF_AUTH_TOKEN
 """) from e
 
     import argparse
-    parser = argparse.ArgumentParser(__file__, description='prepare kaldi data directory with common voice data')
+    parser = argparse.ArgumentParser(__file__, description='prepare kaldi data directory with common voice data',
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--lexicon', action='store_true', help='generate lexicon for every word using ukro-g2p')
     parser.add_argument('--lang', default='uk', help='language code')
     parser.add_argument('--root', type=Path, default=Path('data/cv'), help='where to put test or train datadirs')

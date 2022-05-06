@@ -8,7 +8,7 @@ from uk.subprocess import sh
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="""\
     Train GMM models.
-    """)
+    """, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-d', '--datadir', type=Path, default='data/cv_train', required=True, help='train data directory')
     parser.add_argument('--dictdir', type=Path, default='data/local/dict', required=True, help='dictionary directory')
     parser.add_argument('--unk', default='<unk>', help='unk word (could be [unk])')
