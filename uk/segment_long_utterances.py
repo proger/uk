@@ -5,12 +5,13 @@ Take a transcript, create kaldi dict using g2p, prepare lang, run steps/cleanup/
 import argparse
 import os
 from pathlib import Path
-import shutil
 
 from loguru import logger
 
+from uk.dynamic import import_function
 from uk.subprocess import sh, check_output
 from uk.prepare_lang import extend_dict
+
 
 parser = argparse.ArgumentParser(description="""\
 python3 -m uk.segment_long_utterances -w exp/corpus -o data/semesyuk_farshrutka_prologue data/local/semesyuk_farshrutka/01_prologue.txt semesyuk-to-text/audio/raw/semesyuk_farshrutka/01_prologue.mp3
@@ -20,6 +21,7 @@ parser.add_argument('-d', '--dict-dir', type=Path, default='data/local/dict')
 parser.add_argument('-u', '--unk-fst', type=Path, default='exp/make_unk/unk_fst.txt')
 parser.add_argument('-m', '--model-dir', type=Path, default='exp/tri3b')
 parser.add_argument('-o', '--output-dir', type=Path, required=True, help='output kaldi data directory with short utterances')
+parser.add_argument('--g2p_batch', type=import_function, default='uk.g2p:g2p_batch', help='batched g2p implementation')
 parser.add_argument('--nj', default=os.cpu_count() or 1, help='number of parallel jobs')
 parser.add_argument('--stage', default=-1, type=int, help='script stage')
 parser.add_argument('corpus_txt', type=Path, help='must be tokenized (see README)')
@@ -39,7 +41,7 @@ langdir = args.work_dir / 'lang'
 
 if stage <= -3:
     words = args.corpus_txt.read_text().split()
-    extend_dict(words, dict_dir, args.dict_dir)
+    extend_dict(words, dict_dir, args.dict_dir, g2p_batch=args.g2p_batch)
 
     sh('utils/prepare_lang.sh', '--unk-fst', args.unk_fst, dict_dir, "<unk>", args.work_dir / 'lang_tmp', langdir)
 

@@ -7,21 +7,21 @@ from pathlib import Path
 import shutil
 from typing import List
 
-from uk.g2p import g2p
-from uk.subprocess import sh, check_output
+from uk.g2p import G2PBatched, g2p_batch
+from uk.subprocess import sh
 
 
-def extend_dict(words: List[str], dict_dir: Path, source_dict_dir: Path):
-    shutil.copy(source_dict_dir / 'extra_questions.txt', dict_dir / 'extra_questions.txt')
+def extend_dict(words: List[str], dict_dir: Path, source_dict_dir: Path, g2p_batch: G2PBatched = g2p_batch) -> None:
+    extra_questions = 'extra_questions.txt'
+    if (source_dict_dir / extra_questions).exists():
+        shutil.copy(source_dict_dir / extra_questions, dict_dir / extra_questions)
     shutil.copy(source_dict_dir / 'optional_silence.txt', dict_dir / 'optional_silence.txt')
     shutil.copy(source_dict_dir / 'silence_phones.txt', dict_dir / 'silence_phones.txt')
     shutil.copy(source_dict_dir / 'nonsilence_phones.txt', dict_dir / 'nonsilence_phones.txt')
 
     with open(dict_dir / 'lexicon.txt', 'w') as f:
         with open(source_dict_dir / 'lexicon.txt') as lexicon:
-            oov = {}
-            for word in words:
-                oov[word] = ' '.join(g2p(word))
+            oov = dict(g2p_batch(words))
 
             for line in lexicon:
                 word, prons = line.split(maxsplit=1)
