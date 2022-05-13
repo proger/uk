@@ -21,6 +21,7 @@ replacements = {
     'SH23': 'SH2',
     'H3': 'H',
     'M3': 'M',
+    'RJ3': 'RJ',
 }
 
 
