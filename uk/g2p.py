@@ -6,6 +6,8 @@ import os
 import warnings
 from typing import Sequence, Mapping, Callable
 
+from loguru import logger
+
 warnings.warn('Setting CUDA_VISIBLE_DEVICES="" due to bug in ukro-g2p==0.1.5')
 os.environ['CUDA_VISIBLE_DEVICES'] = ''
 
@@ -32,5 +34,9 @@ def g2p(word):
 def g2p_batch(words: Sequence[str]) -> Mapping[str, str]:
     oov = {}
     for word in words:
-        oov[word] = ' '.join(g2p(word))
+        try:
+            word = word.replace('i', 'і') # oops
+            oov[word] = ' '.join(g2p(word))
+        except:
+            logger.warning('failed on word: {}', word)
     return oov
