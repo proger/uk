@@ -38,7 +38,7 @@ def datadir_to_artifact(datadir: Path):
         columns.extend(["phones", "phone-durations"])
     table = wandb.Table(columns=columns)
 
-    with ReadHelper(f'scp:{datadir}/wav.scp', segments=segments if segments.exists() else None) as reader:
+    with ReadHelper(f'scp:{datadir}/wav.scp', segments=str(segments) if segments.exists() else None) as reader:
         for utt_id, (sample_rate, array) in reader:
             audio = wandb.Audio(array, sample_rate=sample_rate)
             row = [utt_id, audio, text[utt_id]]
