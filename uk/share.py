@@ -7,10 +7,11 @@ import wandb
 
 def datadir_to_artifact(datadir: Path):
     text = {}
-    with open(datadir / 'text') as f:
-        for line in f:
-            utt_id, transcript = line.strip().split(maxsplit=1)
-            text[utt_id] = transcript
+    if (datadir / 'text').exists():
+        with open(datadir / 'text') as f:
+            for line in f:
+                utt_id, transcript = line.strip().split(maxsplit=1)
+                text[utt_id] = transcript
 
     speakers = {}
     with open(datadir / 'utt2spk') as f:
@@ -33,7 +34,9 @@ def datadir_to_artifact(datadir: Path):
                 utt_id, phn = line.strip().split(maxsplit=1)
                 phone_durations[utt_id] = phn
 
-    columns = ["utt_id", "audio", "text"]
+    columns = ["utt_id", "audio"]
+    if text:
+        columns.extend(["text"])
     if phones:
         columns.extend(["phones", "phone-durations"])
     table = wandb.Table(columns=columns)
@@ -41,7 +44,9 @@ def datadir_to_artifact(datadir: Path):
     with ReadHelper(f'scp:{datadir}/wav.scp', segments=str(segments) if segments.exists() else None) as reader:
         for utt_id, (sample_rate, array) in reader:
             audio = wandb.Audio(array, sample_rate=sample_rate)
-            row = [utt_id, audio, text[utt_id]]
+            row = [utt_id, audio]
+            if text:
+                row.extend([text[utt_id]])
             if phones:
                 row.extend([phones.get(utt_id, ''), phone_durations.get(utt_id, '')])
             table.add_data(*row)
