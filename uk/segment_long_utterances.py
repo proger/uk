@@ -23,7 +23,7 @@ parser.add_argument('-m', '--model-dir', type=Path, default='exp/tri3b')
 parser.add_argument('-o', '--output-dir', type=Path, required=True, help='output kaldi data directory with short utterances')
 parser.add_argument('--g2p_batch', type=import_function, default='uk.g2p:g2p_batch', help='batched g2p implementation')
 parser.add_argument('--nj', default=os.cpu_count() or 1, help='number of parallel jobs')
-parser.add_argument('--stage', default=-1, type=int, help='script stage')
+parser.add_argument('--stage', default=-3, type=int, help='script stage')
 parser.add_argument('corpus_txt', type=Path, help='must be tokenized (see README)')
 parser.add_argument('mp3', type=Path, help='mp3 to align')
 
