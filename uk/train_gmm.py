@@ -2,6 +2,7 @@ import argparse
 import os
 from pathlib import Path
 
+from uk.prepare_dict import prepare_dict
 from uk.subprocess import sh
 
 
@@ -25,7 +26,7 @@ datadir = args.datadir
 langdir = args.exp / 'lang'
 
 if stage <= 0:
-    sh('local/prepare_dict.sh')
+    prepare_dict(Path('data/local/dict/english_mfa_reference.dict'), args.dictdir)
 
 if stage <= 1:
     sh('utils/prepare_lang.sh', args.dictdir, args.unk, args.exp / 'langtmp', langdir)
