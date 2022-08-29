@@ -114,7 +114,7 @@ if stage <= 18:
 
     ali_to_phones = check_output(['ali-to-phones', '--write-lengths',
                                  args.work_dir / 'ali/final.alimdl',
-                                 f'ark:zcat {args.work_dir}/ali/ali.*.gz |', f'ark,t:-'])
+                                 f'ark:gunzip -c {args.work_dir}/ali/ali.*.gz |', f'ark,t:-'])
     for line in ali_to_phones.decode().splitlines():
         # 01-01476000-01479029-1 106 3 ; 283 3 ; 182 6 ; 88 5 ; 296 7
         utt_id, seq = line.split(maxsplit=1)
