@@ -40,7 +40,7 @@ def tokens(s):
 
 
 def write_scp(scp: Dict[str, str], filename: Path):
-    with open(datadir / filename, 'w') as f:
+    with open(filename, 'w') as f:
         for utterance_id in sorted(scp):
             print(utterance_id, scp[utterance_id], file=f)
 
