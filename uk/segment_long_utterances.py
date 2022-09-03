@@ -11,6 +11,7 @@ from loguru import logger
 from uk.dynamic import import_function
 from uk.subprocess import sh, check_output
 from uk.prepare_lang import extend_dict
+from uk.textgrid import ctm_to_textgrid
 
 
 parser = argparse.ArgumentParser(description="""\
@@ -91,30 +92,45 @@ if stage <= 16:
     with open(args.work_dir / 'resegmented' / 'wav.scp', 'w') as f:
         print(args.mp3.stem, 'ffmpeg -nostdin -i', args.mp3.absolute(), '-ac 1 -acodec pcm_s16le -f wav - |', file=f)
 
-    sh('utils/data/extract_wav_segments_data_dir.sh',  args.work_dir / 'resegmented', args.output_dir)
+    # extract each segments as its own wav into the output
+    (args.output_dir / 'wav').mkdir(exist_ok=True)
+    with open(args.output_dir / 'wav.scp', 'w') as out:
+        with open(args.work_dir / 'resegmented' / 'segments') as f:
+            for line in f:
+                segment_id = line.split()[0]
+                print(segment_id, args.output_dir / 'wav' / f'{segment_id}.wav', file=out)
+
+    sh('extract-segments',
+       f"scp:{args.work_dir / 'resegmented' / 'wav.scp'}",
+       args.work_dir / 'resegmented' / 'segments',
+       f"scp:{args.output_dir / 'wav.scp'}")
 
 if stage <= 17:
-    # extract alignments
+    # compute alignments
     sh('steps/compute_cmvn_stats.sh', args.work_dir / 'resegmented')
     sh('steps/align_fmllr.sh', args.work_dir / 'resegmented', langdir, args.model_dir, args.work_dir / 'ali')
+
+#
+# read phone symbol table
+#
+symtab = {}
+with open(langdir / 'phones.txt') as f:
+    for line in f:
+        phone_sym, phone_int = line.split()
+        symtab[phone_int] = phone_sym
 
 if stage <= 18:
     #
     # export alignments
     #
 
-    symtab = {}
-    with open(langdir / 'phones.txt') as f:
-        for line in f:
-            phone_sym, phone_int = line.split()
-            symtab[phone_int] = phone_sym
-
     phones = {}
     phone_durations = {}
 
     ali_to_phones = check_output(['ali-to-phones', '--write-lengths',
                                  args.work_dir / 'ali/final.alimdl',
-                                 f'ark:gunzip -c {args.work_dir}/ali/ali.*.gz |', f'ark,t:-'])
+                                 f'ark:gunzip -c {args.work_dir}/ali/ali.*.gz |',
+                                 f'ark,t:-'])
     for line in ali_to_phones.decode().splitlines():
         # 01-01476000-01479029-1 106 3 ; 283 3 ; 182 6 ; 88 5 ; 296 7
         utt_id, seq = line.split(maxsplit=1)
@@ -131,4 +147,21 @@ if stage <= 18:
             print(utt_id, phone_durations[utt_id], file=f)
 
 if stage <= 19:
+    #
+    # export alignments as TextGrid
+    #
+
+    ctm_output = args.output_dir / 'ctm'
+    check_output(['ali-to-phones', '--ctm-output',
+                  args.work_dir / 'ali/final.alimdl',
+                  f'ark:gunzip -c {args.work_dir}/ali/ali.*.gz |',
+                  ctm_output])
+    logger.info('wrote ctm to {}', ctm_output)
+    textgrid_output = args.output_dir / 'textgrid'
+    textgrid_output.mkdir(exist_ok=True)
+    with open(ctm_output) as f:
+        ctm_to_textgrid(f, textgrid_output, symtab)
+    logger.info('wrote TextGrid files to {}', textgrid_output)
+
+if stage <= 20:
     logger.info('upload to wandb using: python3 -m uk.share {}', args.output_dir)
