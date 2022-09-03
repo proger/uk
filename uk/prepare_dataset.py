@@ -112,15 +112,6 @@ def prepare(dataset, datadir, g2p=None, alphabet='cyr', copy_wav=False):
 
 
 if __name__ == '__main__':
-    try:
-        auth_token = os.environ['HF_AUTH_TOKEN']
-    except KeyError as e:
-        raise Exception("""
-
-Please request access to the dataset at https://huggingface.co/datasets/mozilla-foundation/common_voice_10_0
-and export a token from https://huggingface.co/settings/tokens as HF_AUTH_TOKEN
-""") from e
-
     import argparse
     parser = argparse.ArgumentParser(__file__, description='prepare kaldi data directory with a speech dataset from Hugging Face',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)

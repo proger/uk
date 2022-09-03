@@ -54,10 +54,9 @@ Prerequisites:
 
 - Request access at https://huggingface.co/datasets/mozilla-foundation/common_voice_10_0
 - Get a Hugging Face token at https://huggingface.co/settings/tokens
+- run `huggingface-cli login`
 
 ```bash
-export HF_AUTH_TOKEN=hf_yolo
-
 # bring parts of kaldi into $PATH
 source path.sh
 
