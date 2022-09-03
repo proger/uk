@@ -11,9 +11,10 @@ if __name__ == '__main__':
     Train GMM models.
     """, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-d', '--datadir', type=Path, default='data/cv/train', metavar='data/path/to/train', help='train data directory (see uk.common_voice)')
-    parser.add_argument('--dictdir', type=Path, metavar='data/local/dict', default='data/local/dict', help='dictionary directory (see local/prepare_dict.sh)')
+    parser.add_argument('--dictdir', type=Path, metavar='data/local/dict', default='data/local/dict', help='dictionary directory output')
     parser.add_argument('--unk', metavar='<unk>', default='<unk>', help='unk word (could be [unk])')
     parser.add_argument('--stage', type=int, metavar='0', default=0)
+    parser.add_argument('--english', action='store_true', help='use English dictionary in stage 0, otherwise runs local/prepare_dict.sh')
     parser.add_argument('exp', type=Path, help='experiment root directory')
     args = parser.parse_args()
 else:
@@ -26,7 +27,10 @@ datadir = args.datadir
 langdir = args.exp / 'lang'
 
 if stage <= 0:
-    prepare_dict(Path('data/local/dict/english_mfa_reference.dict'), args.dictdir)
+    if args.english:
+        prepare_dict(Path('data/local/dict/english_mfa_reference.dict'), args.dictdir)
+    else:
+        sh('local/prepare_dict.sh')
 
 if stage <= 1:
     sh('utils/prepare_lang.sh', args.dictdir, args.unk, args.exp / 'langtmp', langdir)

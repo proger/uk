@@ -79,8 +79,8 @@ source path.sh
 # make a subset of librispeech
 utils/subset_data_dir.sh --per-spk data/darkproger/librispeech_asr/train.clean.100/full 30 data/librispeech_mini
 
-# progressively train mono, tri, tri2b, tri3b models
-python3 -m uk.train_gmm -d data/librispeech_mini --dictdir data/english exp/english
+# progressively train mono, tri, tri2b, tri3b models, note --english
+python3 -m uk.train_gmm -d data/librispeech_mini --dictdir data/english --english exp/english
 ```
 
 ### Segment Parallel Speech and Text Data
