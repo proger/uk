@@ -18,6 +18,7 @@ setuptools.setup(
         "datasets",
         "kaldiio",
         "loguru",
+        "soundfile",
         "torch",
         "torchaudio",
         "tqdm",
