@@ -91,7 +91,17 @@ if stage <= 16:
     with open(args.work_dir / 'resegmented' / 'wav.scp', 'w') as f:
         print(args.mp3.stem, 'ffmpeg -nostdin -i', args.mp3.absolute(), '-ac 1 -acodec pcm_s16le -f wav - |', file=f)
 
-    sh('utils/data/extract_wav_segments_data_dir.sh',  args.work_dir / 'resegmented', args.output_dir)
+    (args.output_dir / 'wav').mkdir(exist_ok=True)
+    with open(args.output_dir / 'wav.scp', 'w') as out:
+        with open(args.work_dir / 'resegmented' / 'segments') as f:
+            for line in f:
+                segment_id = line.split()[0]
+                print(segment_id, args.output_dir / 'wav' / f'{segment_id}.wav', file=out)
+
+    sh('extract-segments',
+       f"scp:{args.work_dir / 'resegmented' / 'wav.scp'}",
+       args.work_dir / 'resegmented' / 'segments',
+       f"scp:{args.output_dir / 'wav.scp'}")
 
 if stage <= 17:
     # extract alignments
