@@ -4,7 +4,7 @@ Read tokens as in https://github.com/lang-uk/semesyuk-to-text
 
 import sys
 
-from uk.common_voice import keep_useful_characters
+from uk.prepare_dataset import keep_useful_characters
 
 def useful(tok):
     return len(tok) > 0
