@@ -11,6 +11,7 @@ from typing import Dict, Set
 
 import datasets
 from loguru import logger
+from sqlite_utils import Database
 import torch
 import torchaudio
 from tqdm import tqdm
@@ -58,6 +59,8 @@ def prepare(dataset, datadir, g2p=None, alphabet='cyr', copy_wav=False):
     datadir.mkdir(exist_ok=True, parents=True)
     (datadir / 'wav').mkdir(exist_ok=True)
 
+    db = Database(datadir / 'db.sqlite', recreate=True)
+
     text = {}
     utt2spk = {}
     spk2utt = defaultdict(set)
@@ -73,8 +76,8 @@ def prepare(dataset, datadir, g2p=None, alphabet='cyr', copy_wav=False):
             utterance_id = str(sample.get('id') or Path(sample['path']).stem)
             speaker_id = str(sample.get('speaker_id', utterance_id))
 
-            sentence = sample.get('sentence') or sample['text']
-            sentence = keep_useful_characters(sentence, alphabet=alphabet)
+            orig_sentence = sample.get('sentence') or sample['text']
+            sentence = keep_useful_characters(orig_sentence, alphabet=alphabet)
             words = [keep_useful_characters(t, alphabet=alphabet) for t in tokens(sentence)]
 
             text[utterance_id] = ' '.join(words)
@@ -91,6 +94,12 @@ def prepare(dataset, datadir, g2p=None, alphabet='cyr', copy_wav=False):
                 loc = sample['audio']['path']
                 wavscp[utterance_id] = f'sox {loc} -r 16k -t wav -c 1 - |'
 
+            db['utterances'].insert(dict(utterance_id=utterance_id,
+                                         text=text[utterance_id],
+                                         orig_text=orig_sentence,
+                                         spk=utt2spk[utterance_id],
+                                         media=loc), pk='utterance_id')
+
             for word in words:
                 if not word in lexicon:
                     lexicon[word] = None
@@ -104,6 +113,8 @@ def prepare(dataset, datadir, g2p=None, alphabet='cyr', copy_wav=False):
             if lexicon[word]:
                 print(word, lexicon[word], file=lexicon_txt)
             print(word, file=words_txt)
+
+    db['utterances'].enable_fts(['text', 'orig_text'])
 
     write_scp(text, datadir / 'text')
     write_scp(utt2spk, datadir / 'utt2spk')

@@ -20,6 +20,7 @@ setuptools.setup(
         "loguru",
         "praatio",
         "soundfile",
+        "sqlite_utils",
         "torch",
         "torchaudio",
         "tqdm",
