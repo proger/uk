@@ -17,23 +17,25 @@ import torchaudio
 from tqdm import tqdm
 
 
+alphabet_filter = {
+    'latin': re.compile(r'[^A-Za-z\' -]'),
+    'cyr': re.compile(r'[^ыёэъЫЁЭЪйцукенгшщзхїфивапролджєґячсміiтьбюЙЦУКЕНГШЩЗХЇФИВАПРОЛДЖЄҐЯЧСМІТЬБЮ\' -]'),
+    'uk': re.compile(         r'[^йцукенгшщзхїфивапролджєґячсміiтьбюЙЦУКЕНГШЩЗХЇФИВАПРОЛДЖЄҐЯЧСМІТЬБЮ\' -]')
+}
+re_whitespace = re.compile(r'[\s-]+')
+re_leading_apostrophes = re.compile(r'^\'+')
+re_trailing_apostrophes = re.compile(r'\'+$')
 
 
 def keep_useful_characters(s, alphabet='cyr', utterance_id='sentence'):
     s = s.lower()
     s1 = s.replace('’', "'")
-    if alphabet == 'latin':
-        s = re.sub(r'[^A-Za-z\' -]', '', s1)
-    elif alphabet == 'cyr':
-        s = re.sub(r'[^ыёэъЫЁЭЪйцукенгшщзхїфивапролджєґячсміiтьбюЙЦУКЕНГШЩЗХЇФИВАПРОЛДЖЄҐЯЧСМІТЬБЮ\' -]', '', s1)
-    else:
-        s =         re.sub(r'[^йцукенгшщзхїфивапролджєґячсміiтьбюЙЦУКЕНГШЩЗХЇФИВАПРОЛДЖЄҐЯЧСМІТЬБЮ\' -]', '', s1)
+    s = alphabet_filter[alphabet].sub('', s1)
     if s1 != s:
         logger.warning('suspicious {}: |{}|{}|', utterance_id, s1, s)
-    s = re.sub(r'[ -]+', ' ', s)
-    s = re.sub(r'\s+', ' ', s) # unicode whitespace
-    s = re.sub(r'^\'+', '', s) # leading apostrophes
-    s = re.sub(r'\'+$', '', s) # trailing apostrophes
+    s = re_whitespace.sub(' ', s)
+    s = re_leading_apostrophes.sub('', s)
+    s = re_trailing_apostrophes.sub('', s)
     if alphabet != 'latin':
         s = s.replace('i','і')
     s = s.strip()
