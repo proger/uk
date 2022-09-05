@@ -19,18 +19,20 @@ def extend_dict(words: List[str], dict_dir: Path, source_dict_dir: Path, g2p_bat
     shutil.copy(source_dict_dir / 'silence_phones.txt', dict_dir / 'silence_phones.txt')
     shutil.copy(source_dict_dir / 'nonsilence_phones.txt', dict_dir / 'nonsilence_phones.txt')
 
+    oov = set(words)
+
     with open(dict_dir / 'lexicon.txt', 'w') as f:
         with open(source_dict_dir / 'lexicon.txt') as lexicon:
-            oov = dict(g2p_batch(words))
-
             for line in lexicon:
                 word, prons = line.split(maxsplit=1)
                 print(word, prons.strip(), file=f)
                 if word in oov:
-                    del oov[word]
+                    oov.remove(word)
 
-        for word in oov:
-            print(word, oov[word].strip(), file=f)
+        new_lexicon = dict(g2p_batch(sorted(oov)))
+
+        for word in new_lexicon:
+            print(word, new_lexicon[word].strip(), file=f)
 
 
 def format_ngram_lm(corpus_txt: Path, work_dir: Path, lexiconp_txt: Path, order=2):
