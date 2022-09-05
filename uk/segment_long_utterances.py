@@ -44,7 +44,11 @@ if stage <= -3:
     words = args.corpus_txt.read_text().split()
     extend_dict(words, dict_dir, args.dict_dir, g2p_batch=args.g2p_batch)
 
-    sh('utils/prepare_lang.sh', '--unk-fst', args.unk_fst, dict_dir, "<unk>", args.work_dir / 'lang_tmp', langdir)
+    if args.unk_fst.is_file() and args.unk_fst.exists():
+        sh('utils/prepare_lang.sh', '--unk-fst', args.unk_fst, dict_dir, "<unk>", args.work_dir / 'lang_tmp', langdir)
+    else:
+        logger.warning('ignored unk-fst')
+        sh('utils/prepare_lang.sh', dict_dir, "[unk]", args.work_dir / 'lang_tmp', langdir)
 
 if stage <= -2:
     with open(datadir / 'text', 'w') as f:
