@@ -17,15 +17,19 @@ import torchaudio
 from tqdm import tqdm
 
 
-def keep_useful_characters(s, alphabet='cyr'):
+
+
+def keep_useful_characters(s, alphabet='cyr', utterance_id='sentence'):
     s = s.lower()
-    s = s.replace('’', "'")
+    s1 = s.replace('’', "'")
     if alphabet == 'latin':
-        s = re.sub(r'[^A-Za-z\' -]', '', s)
+        s = re.sub(r'[^A-Za-z\' -]', '', s1)
     elif alphabet == 'cyr':
-        s = re.sub(r'[^ыёэъЫЁЭЪйцукенгшщзхїфивапролджєґячсміiтьбюЙЦУКЕНГШЩЗХЇФИВАПРОЛДЖЄҐЯЧСМІТЬБЮ\' -]', '', s)
+        s = re.sub(r'[^ыёэъЫЁЭЪйцукенгшщзхїфивапролджєґячсміiтьбюЙЦУКЕНГШЩЗХЇФИВАПРОЛДЖЄҐЯЧСМІТЬБЮ\' -]', '', s1)
     else:
-        s =         re.sub(r'[^йцукенгшщзхїфивапролджєґячсміiтьбюЙЦУКЕНГШЩЗХЇФИВАПРОЛДЖЄҐЯЧСМІТЬБЮ\' -]', '', s)
+        s =         re.sub(r'[^йцукенгшщзхїфивапролджєґячсміiтьбюЙЦУКЕНГШЩЗХЇФИВАПРОЛДЖЄҐЯЧСМІТЬБЮ\' -]', '', s1)
+    if s1 != s:
+        logger.warning('suspicious {}: |{}|{}|', utterance_id, s1, s)
     s = re.sub(r'[ -]+', ' ', s)
     s = re.sub(r'\s+', ' ', s) # unicode whitespace
     s = re.sub(r'^\'+', '', s) # leading apostrophes
@@ -77,8 +81,9 @@ def prepare(dataset, datadir, g2p=None, alphabet='cyr', copy_wav=False):
             speaker_id = str(sample.get('speaker_id', utterance_id))
 
             orig_sentence = sample.get('sentence') or sample['text']
-            sentence = keep_useful_characters(orig_sentence, alphabet=alphabet)
-            words = [keep_useful_characters(t, alphabet=alphabet) for t in tokens(sentence)]
+            sentence = keep_useful_characters(orig_sentence, alphabet=alphabet, utterance_id=utterance_id)
+            words = [keep_useful_characters(t, alphabet=alphabet, utterance_id=utterance_id)
+                     for t in tokens(sentence)]
 
             text[utterance_id] = ' '.join(words)
             utt2spk[utterance_id] = speaker_id
