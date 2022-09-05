@@ -7,6 +7,8 @@ from pathlib import Path
 import shutil
 from typing import List
 
+from loguru import logger
+
 from uk.g2p import G2PBatched, g2p_batch
 from uk.subprocess import sh
 
@@ -32,6 +34,8 @@ def extend_dict(words: List[str], dict_dir: Path, source_dict_dir: Path, g2p_bat
         new_lexicon = dict(g2p_batch(sorted(oov)))
 
         for word in new_lexicon:
+            if len(word) > 20:
+                logger.warning('word too long: {}', word)
             print(word, new_lexicon[word].strip(), file=f)
 
 
