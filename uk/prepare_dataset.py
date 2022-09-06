@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import re
 from typing import Dict, Set
+import unicodedata
 
 import datasets
 from loguru import logger
@@ -16,28 +17,36 @@ import torch
 import torchaudio
 from tqdm import tqdm
 
-
 alphabet_filter = {
     'latin': re.compile(r'[^A-Za-z\' -]'),
     'cyr': re.compile(r'[^ыёэъЫЁЭЪйцукенгшщзхїфивапролджєґячсміiтьбюЙЦУКЕНГШЩЗХЇФИВАПРОЛДЖЄҐЯЧСМІТЬБЮ\' -]'),
     'uk': re.compile(         r'[^йцукенгшщзхїфивапролджєґячсміiтьбюЙЦУКЕНГШЩЗХЇФИВАПРОЛДЖЄҐЯЧСМІТЬБЮ\' -]')
 }
+re_punct = re.compile(r'[\.,!?"«»“”…:;–—-]+')
 re_whitespace = re.compile(r'[\s-]+')
-re_leading_apostrophes = re.compile(r'^\'+')
-re_trailing_apostrophes = re.compile(r'\'+$')
+re_leading = re.compile(r'^[\'-]+')
+re_trailing = re.compile(r'[\'-]+$')
+
+
+def strip_accents(s):
+    return ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn')
 
 
 def keep_useful_characters(s, alphabet='cyr', utterance_id='sentence'):
     s = s.lower()
+    if alphabet != 'latin':
+        s = s.replace('e', 'е')
+        s = s.replace('i', 'і')
     s1 = s.replace('’', "'")
+    s1 = re_punct.sub(' ', s1)
+    s1 = strip_accents(s1)
     s = alphabet_filter[alphabet].sub('', s1)
     if s1 != s:
-        logger.warning('suspicious {}: |{}|{}|', utterance_id, s1, s)
+        logger.warning('skipping suspicious {}: |{}|{}|', utterance_id, s1, s)
+        return None
     s = re_whitespace.sub(' ', s)
-    s = re_leading_apostrophes.sub('', s)
-    s = re_trailing_apostrophes.sub('', s)
-    if alphabet != 'latin':
-        s = s.replace('i','і')
+    s = re_leading.sub('', s)
+    s = re_trailing.sub('', s)
     s = s.strip()
     return s
 
@@ -84,6 +93,8 @@ def prepare(dataset, datadir, g2p=None, alphabet='cyr', copy_wav=False):
 
             orig_sentence = sample.get('sentence') or sample['text']
             sentence = keep_useful_characters(orig_sentence, alphabet=alphabet, utterance_id=utterance_id)
+            if sentence is None:
+                continue
             words = [keep_useful_characters(t, alphabet=alphabet, utterance_id=utterance_id)
                      for t in tokens(sentence)]
 
