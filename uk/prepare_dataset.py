@@ -29,21 +29,30 @@ re_trailing = re.compile(r'[\'-]+$')
 
 
 def strip_accents(s):
-    return ''.join(c for c in unicodedata.normalize('NFD', s) if unicodedata.category(c) != 'Mn')
+    return ''.join(c for c in unicodedata.normalize('NFD', s)
+                   if unicodedata.category(c) != 'Mn' and c != 'й')
 
 
-def keep_useful_characters(s, alphabet='cyr', utterance_id='sentence'):
-    s = s.lower()
+def keep_useful_characters(sentence, alphabet='cyr', utterance_id='sentence'):
+    s = sentence.lower()
     if alphabet != 'latin':
         s = s.replace('e', 'е')
         s = s.replace('i', 'і')
-        s = s.replace('й', 'й')
-    s1 = s.replace('’', "'")
-    s1 = re_punct.sub(' ', s1)
+        s = s.replace('o', 'о')
+        s = s.replace('p', 'р')
+        s = s.replace('x', 'х')
+        s = s.replace('y', 'у')
+        if alphabet == 'uk':
+            s = s.replace('ы', 'и')
+    s = s.replace('’', "'")
+    s = s.replace('`', "'")
+    s = s.replace('՚', "'")
+    s = re_punct.sub(' ', s)
+    s1 = s
     s1 = strip_accents(s1)
     s = alphabet_filter[alphabet].sub('', s1)
     if s1 != s:
-        logger.warning('skipping suspicious {}: |{}|{}|', utterance_id, s1, s)
+        logger.warning('skipping suspicious {}: |{}|{}|', utterance_id, (sentence, s1), s)
         return None
     s = re_whitespace.sub(' ', s)
     s = re_leading.sub('', s)
