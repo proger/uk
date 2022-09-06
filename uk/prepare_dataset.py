@@ -37,6 +37,7 @@ def keep_useful_characters(s, alphabet='cyr', utterance_id='sentence'):
     if alphabet != 'latin':
         s = s.replace('e', 'е')
         s = s.replace('i', 'і')
+        s = s.replace('й', 'й')
     s1 = s.replace('’', "'")
     s1 = re_punct.sub(' ', s1)
     s1 = strip_accents(s1)
