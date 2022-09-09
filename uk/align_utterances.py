@@ -64,7 +64,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="""\
     Align utterances for downstream applications.
 
-    python3 -m uk.align_utterances -a exp/corpus/ali -l exp/corpus/lang -m exp/tri3b -o data/semesyuk_farshrutka_prologue exp/corpus/resegmented
+    python3 -m uk.align_utterances -a exp/corpus/ali -l exp/corpus/lang -m exp/tri3b exp/corpus/resegmented
     """, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-a', '--output-ali-dir', type=Path, required=True)
     parser.add_argument('-l', '--lang-dir', type=Path, default='exp/lang')
