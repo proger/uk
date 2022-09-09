@@ -56,7 +56,7 @@ if __name__ == '__main__':
     python3 -m uk.prepare_lang -w exp/lang -o data/lang data/local/semesyuk_farshrutka/01_prologue.txt
     """, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-o', '--output-dir', type=Path, required=True)
-    parser.add_argument('-d', '--dict-dir', type=Path, default='data/local/dict', help='source dictionary')
+    parser.add_argument('-d', '--dict-dir', type=Path, default='exp/dict', help='source dictionary')
     parser.add_argument('--g2p_batch', type=import_function, default='uk.g2p:g2p_batch', help='batched g2p implementation')
     parser.add_argument('--text', action='store_true', default='corpus_txt is kaldi text')
     parser.add_argument('corpus_txt', type=Path, help='must be tokenized (see README)')
