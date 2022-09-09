@@ -83,6 +83,38 @@ utils/subset_data_dir.sh --per-spk data/darkproger/librispeech_asr/train.clean.1
 python3 -m uk.train_gmm -d data/librispeech_mini --dictdir data/english --english exp/english
 ```
 
+### Align Text to Audio and Trim Silence
+
+Some Ukrainian unvoiced sounds are considered noise by VADs trained on English.
+It's useful to perform segmentation using an acoustic model instead.
+
+
+Uses the [Lada dataset](https://github.com/egorsmkv/ukrainian-tts-datasets/tree/main/lada).
+`data/dataset_lada` comes from `dataset_lada_ogg.zip` file.
+
+Assumes a Ukrainian model to be present in `exp/tri3b`, see above.
+
+```bash
+# Prepare data directory. We need text, utt2spk and wav.scp
+mkdir -p data/lada
+< data/dataset_lada/accept/metadata.jsonl  jq  -rc '[.file,.orig_text] | @tsv' | python3 -m uk.clean_text | sed 's,.ogg,,' | sort > data/lada/text
+find data/dataset_lada/accept/ -name '*.ogg' | sort | awk -F/ '{s=$4;sub(".ogg","",s); print s, "lada"}' > data/lada/utt2spk
+find data/dataset_lada/accept/ -name '*.ogg' | sort | awk -F/ '{s=$4;sub(".ogg","",s); print s, "ffmpeg -nostdin -i data/"$0" -ac 1 -acodec pcm_s16le -f wav - |"}' > data/lada/wav.scp
+
+# Prepare lang. Makes every word pronunciation known by running G2P.
+python3 -m uk.prepare_dict -o exp/dict_base data/local/dict/lexicon_common_voice_uk.txt
+python3 -m uk.prepare_lang -d exp/dict_base -o data/lada --text data/lada/text
+
+# Compute and export alignments to exp/lada
+python3 -m uk.align_utterances -a exp/ali -l data/lada/lang -m exp/tri3b data/lada
+
+# Write a segments file for utterances without leading and trailing silence
+python3 -m uk.trim_silence -l data/lada/lang/lang exp/ali/ > data/lada/segments
+
+# Extract separate wavs
+python3 -m uk.extract_segments -o data/lada_seg -i data/lada/wav.scp data/lada/segments
+```
+
 ### Segment Parallel Speech and Text Data
 
 ```bash
