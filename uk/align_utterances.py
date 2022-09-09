@@ -14,9 +14,9 @@ def read_symtab(langdir):
     return symtab
 
 
-def align_utterances(input_dir, langdir, model_dir, ali_dir):
+def align_utterances(input_dir, langdir, model_dir, ali_dir, nj=1):
     sh('steps/compute_cmvn_stats.sh', input_dir)
-    sh('steps/align_fmllr.sh', input_dir, langdir, model_dir, ali_dir)
+    sh('steps/align_fmllr.sh', input_dir, langdir, model_dir, ali_dir, nj=nj)
 
 
 def export_alignments(ali_dir, symtab, output_dir):

@@ -9,9 +9,8 @@ from pathlib import Path
 from loguru import logger
 
 from uk.dynamic import import_function
-from uk.subprocess import sh, check_output
+from uk.subprocess import sh
 from uk.prepare_lang import extend_dict
-from uk.textgrid import ctm_to_textgrid
 from uk.align_utterances import align_utterances, export_alignments, export_as_textgrid, read_symtab
 
 
@@ -111,7 +110,7 @@ if stage <= 16:
        f"scp:{args.output_dir / 'wav.scp'}")
 
 if stage <= 17:
-    align_utterances(args.work_dir / 'resegmented', langdir, args.model_dir, args.work_dir / 'ali')
+    align_utterances(args.work_dir / 'resegmented', langdir, args.model_dir, args.work_dir / 'ali', nj=args.nj)
 
 symtab = read_symtab(langdir)
 
