@@ -12,6 +12,7 @@ from uk.dynamic import import_function
 from uk.subprocess import sh, check_output
 from uk.prepare_lang import extend_dict
 from uk.textgrid import ctm_to_textgrid
+from uk.align_utterances import align_utterances, export_alignments, export_as_textgrid, read_symtab
 
 
 parser = argparse.ArgumentParser(description="""\
@@ -110,62 +111,15 @@ if stage <= 16:
        f"scp:{args.output_dir / 'wav.scp'}")
 
 if stage <= 17:
-    # compute alignments
-    sh('steps/compute_cmvn_stats.sh', args.work_dir / 'resegmented')
-    sh('steps/align_fmllr.sh', args.work_dir / 'resegmented', langdir, args.model_dir, args.work_dir / 'ali')
+    align_utterances(args.work_dir / 'resegmented', langdir, args.model_dir, args.work_dir / 'ali')
 
-#
-# read phone symbol table
-#
-symtab = {}
-with open(langdir / 'phones.txt') as f:
-    for line in f:
-        phone_sym, phone_int = line.split()
-        symtab[phone_int] = phone_sym
+symtab = read_symtab(langdir)
 
 if stage <= 18:
-    #
-    # export alignments
-    #
-
-    phones = {}
-    phone_durations = {}
-
-    ali_to_phones = check_output(['ali-to-phones', '--write-lengths',
-                                 args.work_dir / 'ali/final.alimdl',
-                                 f'ark:gunzip -c {args.work_dir}/ali/ali.*.gz |',
-                                 f'ark,t:-'])
-    for line in ali_to_phones.decode().splitlines():
-        # 01-01476000-01479029-1 106 3 ; 283 3 ; 182 6 ; 88 5 ; 296 7
-        utt_id, seq = line.split(maxsplit=1)
-        phones1, durations = zip(*[s.split() for s in seq.split(' ; ')])
-        phones[utt_id] = ' '.join(symtab[phone_int] for phone_int in phones1)
-        phone_durations[utt_id] = ' '.join(durations)
-
-    with open(args.output_dir / 'phones', 'w') as f:
-        for utt_id in sorted(phones):
-            print(utt_id, phones[utt_id], file=f)
-
-    with open(args.output_dir / 'phone-durations', 'w') as f:
-        for utt_id in sorted(phone_durations):
-            print(utt_id, phone_durations[utt_id], file=f)
+    export_alignments(args.work_dir / 'ali', symtab, args.output_dir)
 
 if stage <= 19:
-    #
-    # export alignments as TextGrid
-    #
-
-    ctm_output = args.output_dir / 'ctm'
-    check_output(['ali-to-phones', '--ctm-output',
-                  args.work_dir / 'ali/final.alimdl',
-                  f'ark:gunzip -c {args.work_dir}/ali/ali.*.gz |',
-                  ctm_output])
-    logger.info('wrote ctm to {}', ctm_output)
-    textgrid_output = args.output_dir / 'textgrid'
-    textgrid_output.mkdir(exist_ok=True)
-    with open(ctm_output) as f:
-        ctm_to_textgrid(f, textgrid_output, symtab)
-    logger.info('wrote TextGrid files to {}', textgrid_output)
+    export_as_textgrid(args.work_dir / 'ali', symtab, args.output_dir)
 
 if stage <= 20:
     logger.info('upload to wandb using: python3 -m uk.share {}', args.output_dir)
