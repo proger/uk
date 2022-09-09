@@ -69,12 +69,13 @@ if __name__ == '__main__':
     parser.add_argument('-a', '--output-ali-dir', type=Path, required=True)
     parser.add_argument('-l', '--lang-dir', type=Path, default='exp/lang')
     parser.add_argument('-m', '--model-dir', type=Path, default='exp/tri3b')
-    parser.add_argument('-o', '--output-dir', type=Path, required=True, help='output kaldi data directory')
-    parser.add_argument('input_dir', type=Path, help='input data directory')
+    parser.add_argument('data_dir', type=Path, help='data directory')
 
     args = parser.parse_args()
 
-    align_utterances(args.input_dir, args.lang_dir, args.model_dir, args.output_ali_dir)
+    align_utterances(args.data_dir, args.lang_dir, args.model_dir, args.output_ali_dir)
     symtab = read_symtab(args.lang_dir)
-    export_alignments(args.output_ali_dir, symtab, args.output_dir)
-    export_as_textgrid(args.output_ali_dir, symtab, args.output_dir)
+    export_alignments(args.output_ali_dir, symtab, args.data_dir)
+    export_as_textgrid(args.output_ali_dir, symtab, args.data_dir)
+
+    logger.info('upload alignments to wandb using: python3 -m uk.share {}', args.data_dir)
