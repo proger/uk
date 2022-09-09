@@ -9,6 +9,7 @@ from pathlib import Path
 from loguru import logger
 
 from uk.dynamic import import_function
+from uk.extract_segments import extract_segments
 from uk.subprocess import sh
 from uk.prepare_lang import extend_dict
 from uk.align_utterances import align_utterances, export_alignments, export_as_textgrid, read_symtab
@@ -96,18 +97,7 @@ if stage <= 16:
     with open(args.work_dir / 'resegmented' / 'wav.scp', 'w') as f:
         print(args.mp3.stem, 'ffmpeg -nostdin -i', args.mp3.absolute(), '-ac 1 -acodec pcm_s16le -f wav - |', file=f)
 
-    # extract each segments as its own wav into the output
-    (args.output_dir / 'wav').mkdir(exist_ok=True)
-    with open(args.output_dir / 'wav.scp', 'w') as out:
-        with open(args.work_dir / 'resegmented' / 'segments') as f:
-            for line in f:
-                segment_id = line.split()[0]
-                print(segment_id, args.output_dir / 'wav' / f'{segment_id}.wav', file=out)
-
-    sh('extract-segments',
-       f"scp:{args.work_dir / 'resegmented' / 'wav.scp'}",
-       args.work_dir / 'resegmented' / 'segments',
-       f"scp:{args.output_dir / 'wav.scp'}")
+    extract_segments(args.output_dir, args.work_dir / 'resegmented' / 'wav.scp', args.work_dir / 'segments')
 
 if stage <= 17:
     align_utterances(args.work_dir / 'resegmented', langdir, args.model_dir, args.work_dir / 'ali', nj=args.nj)
