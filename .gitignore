@@ -2,14 +2,6 @@
 .ipynb_checkpoints/
 __pycache__/
 data/cv_train/
-data/local/dict/extra_questions.txt
-data/local/dict/lexicon.txt
-data/local/dict/lexicon1_raw_nosil.txt
-data/local/dict/lexicon2_raw.txt
-data/local/dict/lexicon3_expand.txt
-data/local/dict/lexicon4_extra.txt
-data/local/dict/nonsilence_phones.txt
-data/local/dict/optional_silence.txt
-data/local/dict/silence_phones.txt
+data/
 exp/
 wandb/

@@ -11,10 +11,9 @@ if __name__ == '__main__':
     Train GMM models.
     """, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-d', '--datadir', type=Path, default='data/cv/train', metavar='data/path/to/train', help='train data directory (see uk.common_voice)')
-    parser.add_argument('--dictdir', type=Path, metavar='data/local/dict', default='data/local/dict', help='dictionary directory output')
+    parser.add_argument('--lexicon', default='data/local/dict/lexicon_common_voice_uk.txt', type=Path, help='lexicon file (letters to sounds, mfa dict or kaldi lexicon.txt)')
     parser.add_argument('--unk', metavar='<unk>', default='<unk>', help='unk word (could be [unk])')
     parser.add_argument('--stage', type=int, metavar='0', default=0)
-    parser.add_argument('--english', action='store_true', help='use English dictionary in stage 0, otherwise runs local/prepare_dict.sh')
     parser.add_argument('exp', type=Path, help='experiment root directory')
     args = parser.parse_args()
 else:
@@ -25,15 +24,13 @@ nproc = os.cpu_count() or 1
 stage = args.stage
 datadir = args.datadir
 langdir = args.exp / 'lang'
+dict_dir = args.exp / 'dict'
 
 if stage <= 0:
-    if args.english:
-        prepare_dict(Path('data/local/dict/english_mfa_reference.dict'), args.dictdir)
-    else:
-        sh('local/prepare_dict.sh')
+    prepare_dict(args.lexicon, dict_dir)
 
 if stage <= 1:
-    sh('utils/prepare_lang.sh', args.dictdir, args.unk, args.exp / 'langtmp', langdir)
+    sh('utils/prepare_lang.sh', dict_dir, args.unk, args.exp / 'langtmp', langdir)
 
 if stage <= 2:
     sh('steps/make_mfcc.sh', datadir, args.exp / 'log/mfcc/train', args.exp / 'mfcc/train', mfcc_config='conf/mfcc.conf', nj=nproc)

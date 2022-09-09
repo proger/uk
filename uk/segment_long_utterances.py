@@ -18,8 +18,8 @@ parser = argparse.ArgumentParser(description="""\
 python3 -m uk.segment_long_utterances -w exp/corpus -o data/semesyuk_farshrutka_prologue data/local/semesyuk_farshrutka/01_prologue.txt semesyuk-to-text/audio/raw/semesyuk_farshrutka/01_prologue.mp3
 """, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('-w', '--work-dir', type=Path, required=True)
-parser.add_argument('-d', '--dict-dir', type=Path, default='data/local/dict')
-parser.add_argument('-u', '--unk-fst', type=Path, default='exp/make_unk/unk_fst.txt')
+parser.add_argument('-d', '--dict-dir', type=Path, default='exp/dict')
+parser.add_argument('-u', '--unk-fst', type=Path, default='exp/dict/unk/unk_fst.txt')
 parser.add_argument('-m', '--model-dir', type=Path, default='exp/tri3b')
 parser.add_argument('-o', '--output-dir', type=Path, required=True, help='output kaldi data directory with short utterances')
 parser.add_argument('--g2p_batch', type=import_function, default='uk.g2p:g2p_batch', help='batched g2p implementation')

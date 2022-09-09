@@ -58,6 +58,7 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output-dir', type=Path, required=True)
     parser.add_argument('-d', '--dict-dir', type=Path, default='data/local/dict', help='source dictionary')
     parser.add_argument('--g2p_batch', type=import_function, default='uk.g2p:g2p_batch', help='batched g2p implementation')
+    parser.add_argument('--text', action='store_true', default='corpus_txt is kaldi text')
     parser.add_argument('corpus_txt', type=Path, help='must be tokenized (see README)')
 
     args = parser.parse_args()
@@ -67,7 +68,13 @@ if __name__ == '__main__':
 
     langdir = args.output_dir / 'lang'
 
-    words = args.corpus_txt.read_text().split()
+    if args.text:
+        words = []
+        with open(args.corpus_txt) as f:
+            for line in f:
+                words.extend(line.strip().split()[1:])
+    else:
+        words = args.corpus_txt.read_text().split()
     extend_dict(words, dict_dir, args.dict_dir)
 
     sh('utils/prepare_lang.sh', dict_dir, "<unk>", args.output_dir / 'lang_tmp', langdir)
