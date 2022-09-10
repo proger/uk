@@ -101,11 +101,14 @@ mkdir -p data/lada
 find data/dataset_lada/accept/ -name '*.ogg' | sort | awk -F/ '{s=$4;sub(".ogg","",s); print s, "lada"}' > data/lada/utt2spk
 find data/dataset_lada/accept/ -name '*.ogg' | sort | awk -F/ '{s=$4;sub(".ogg","",s); print s, "ffmpeg -nostdin -i data/"$0" -ac 1 -acodec pcm_s16le -f wav - |"}' > data/lada/wav.scp
 
+utils/fix_data_dir.sh data/lada
+
 # Prepare lang. Makes every word pronunciation known by running G2P.
 python3 -m uk.prepare_dict -o exp/dict_base data/local/dict/lexicon_common_voice_uk.txt
 python3 -m uk.prepare_lang -d exp/dict_base -o data/lada --text data/lada/text
 
 # Compute and export alignments to exp/lada
+steps/make_mfcc.sh data/lada
 python3 -m uk.align_utterances -a exp/ali -l data/lada/lang -m exp/tri3b data/lada
 
 # Write a segments file for utterances without leading and trailing silence
