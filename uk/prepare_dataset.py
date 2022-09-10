@@ -93,7 +93,8 @@ def prepare(dataset, datadir, g2p=None, alphabet='cyr', copy_wav=False):
 
         if g2p is not None:
             for word in lexicon:
-                if pron := g2p(word):
+                pron = g2p(word)
+                if pron:
                     lexicon[word] = ' '.join(pron)
 
         for word in sorted(lexicon):

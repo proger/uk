@@ -13,7 +13,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/proger/uk",
     packages=setuptools.find_namespace_packages(include=['uk.*']),
-    python_requires=">=3.8",
+    python_requires=">=3.7",
     install_requires=[
         "datasets",
         "kaldiio",
