@@ -1,4 +1,4 @@
-# Вирівняти довгі аудіо та тексти українською
+# Подбай про фонограми та синтагми з uk
 
 This recipe trains a Ukrainian GMM-HMM on Common Voice 9.0 to use
 for segmentation of long audio files into short utterances using its full transcript.
