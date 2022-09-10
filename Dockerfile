@@ -1,6 +1,6 @@
 FROM kaldiasr/kaldi:latest
 
-RUN apt-get update && apt-get -y install python3-pip
+RUN apt-get update && apt-get -y install python3-pip cmake
 RUN ln -sf /opt/kaldi /kaldi
 WORKDIR /uk
 COPY README.md README.md
