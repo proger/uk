@@ -9,15 +9,17 @@ alphabet_filter = {
     'cyr': re.compile(r'[^ыёэъЫЁЭЪйцукенгшщзхїфивапролджєґячсміiтьбюЙЦУКЕНГШЩЗХЇФИВАПРОЛДЖЄҐЯЧСМІТЬБЮ\' -]'),
     'uk': re.compile(         r'[^йцукенгшщзхїфивапролджєґячсміiтьбюЙЦУКЕНГШЩЗХЇФИВАПРОЛДЖЄҐЯЧСМІТЬБЮ\' -]')
 }
-re_punct = re.compile(r'[\.,!?"«»“”…:;–—-]+')
+re_punct = re.compile(r'[\.,!?"«»“”…:;–—―-]+')
 re_whitespace = re.compile(r'[\s-]+')
 re_leading = re.compile(r'^[\'-]+')
 re_trailing = re.compile(r'[\'-]+$')
 
 
 def strip_accents(s):
-    return ''.join(c for c in unicodedata.normalize('NFD', s)
-                   if unicodedata.category(c) != 'Mn' and c != 'й')
+    t =  ''.join(c for c in unicodedata.normalize('NFD', s)
+                 if unicodedata.category(c) != 'Mn' or unicodedata.name(c) == 'COMBINING BREVE')
+    t = t.replace("й", "й")
+    return t
 
 
 def keep_useful_characters(sentence, alphabet='cyr', utterance_id='sentence'):
