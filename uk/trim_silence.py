@@ -1,10 +1,11 @@
 from pathlib import Path
+from typing import List
 
 from uk.subprocess import check_output
 from uk.align_utterances import read_symtab
 
 
-def trim_phone(ali_dir: Path, int_phone, frame_shift=0.01):
+def trim_phone(ali_dir: Path, int_phones_to_trim: List[str], frame_shift=0.01):
     "make segments without leading and trailing phones from utterances in ali_dir"
 
     ali_to_phones = check_output(['ali-to-phones', '--write-lengths',
@@ -20,12 +21,12 @@ def trim_phone(ali_dir: Path, int_phone, frame_shift=0.01):
         state = 'leading'
         for p, d in zip(int_phones, durations):
             if state == 'leading':
-                if p == int_phone:
+                if p in int_phones_to_trim:
                     leading += int(d)
                 else:
                     state = 'inside'
             elif state == 'inside':
-                if p == int_phone:
+                if p in int_phones_to_trim:
                     trailing -= int(d)
                 else:
                     trailing = end
@@ -48,5 +49,5 @@ if __name__ == '__main__':
 
     symtab = read_symtab(args.lang_dir)
     rsymtab = {v: k for k, v in symtab.items()}
-    for seg in trim_phone(args.ali_dir, rsymtab["sil"]):
+    for seg in trim_phone(args.ali_dir, [rsymtab["sil"], rsymtab["sil_S"]]):
         print(*seg)
