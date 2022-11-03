@@ -27,9 +27,11 @@ cd tools
 # You won't need python2.7 and subversion.
 # Make sure python command runs some python:
 ln -sf $(which python3) $HOME/.local/bin/python
+# On Ubuntu you can do this instead:
+apt-get install python-is-python3
 
 # Ignore all subsequent dependency checks.
-cat > extras/check_dependencies.sh
+echo > extras/check_dependencies.sh
 
 # Build all tools (primarily openfst and pocolm)
 make -j8
