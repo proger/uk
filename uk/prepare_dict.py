@@ -37,6 +37,8 @@ def read_lexicon(lexicon_path: Path):
 
 
 def prepare_dict(lexicon: Path, dict_dir: Path, make_unk=True):
+    dict_dir.mkdir(exist_ok=True, parents=True)
+
     with open(dict_dir / 'silence_phones.txt', 'w') as f:
         print('sil', file=f)
 
@@ -79,5 +81,4 @@ if __name__ == '__main__':
     parser.add_argument('lexicon', type=Path, help='lexicon file (letters to sounds, mfa dict or kaldi lexicon.txt)')
     args = parser.parse_args()
 
-    args.output_dict_dir.mkdir(exist_ok=True)
     prepare_dict(args.lexicon, args.output_dict_dir, make_unk=False)
