@@ -10,7 +10,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="""\
     Train GMM models.
     """, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-d', '--datadir', type=Path, default='data/cv/train', metavar='data/path/to/train', help='train data directory (see uk.common_voice)')
+    parser.add_argument('-d', '--datadir', type=Path, default='data/mozilla-foundation/common_voice_10_0/uk/train',
+                        metavar='data/path/to/train', help='train data directory (see uk.common_voice)')
     parser.add_argument('--lexicon', default='data/local/dict/lexicon_common_voice_uk.txt', type=Path, help='lexicon file (letters to sounds, mfa dict or kaldi lexicon.txt)')
     parser.add_argument('--unk', metavar='<unk>', default='<unk>', help='unk word (could be [unk])')
     parser.add_argument('--stage', type=int, metavar='0', default=0)
