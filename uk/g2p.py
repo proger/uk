@@ -22,6 +22,7 @@ G2PBatched = Callable[[Sequence[str]], Mapping[str, str]]
 
 g2p_base = G2P('ukro-base-uncased')
 
+# X3 means prolonged version of X
 replacements = {
     'SH23': 'SH2',
     'H3': 'H',
@@ -39,9 +40,14 @@ replacements = {
     'ZH3': 'ZH',
 }
 
+_, reference_lexicon = read_lexicon(Path(__file__).parent / '../data/local/dict/lexicon_common_voice_uk.txt')
+
 
 def g2p(word):
-    return [replacements.get(p, p) for p in g2p_base(word)]
+    pron = reference_lexicon.get(word)
+    if not pron:
+        pron = [replacements.get(p, p) for p in g2p_base(word)]
+    return pron
 
 
 def g2p_batch(words: Sequence[str]) -> Mapping[str, str]:

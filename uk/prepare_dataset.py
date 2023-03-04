@@ -57,10 +57,11 @@ def prepare(dataset, datadir, g2p=None, alphabet='cyr', copy_wav=False):
             lexicon_txt = stack.enter_context(open(datadir / 'lexicon.txt', 'w'))
 
         for sample in tqdm(dataset):
-            utterance_id = str(sample.get('id') or Path(sample['path']).stem)
+            #utterance_id = str(sample.get('id') or Path(sample['path']).stem)
+            utterance_id = Path(sample['path']).stem
             speaker_id = str(sample.get('speaker_id', utterance_id))
 
-            orig_sentence = sample.get('sentence') or sample['text']
+            orig_sentence = sample.get('sentence') or sample.get('transcription') or sample['text']
             sentence = keep_useful_characters(orig_sentence, alphabet=alphabet, utterance_id=utterance_id)
             if sentence is None:
                 continue
@@ -85,7 +86,7 @@ def prepare(dataset, datadir, g2p=None, alphabet='cyr', copy_wav=False):
                                          text=text[utterance_id],
                                          orig_text=orig_sentence,
                                          spk=utt2spk[utterance_id],
-                                         media=loc), pk='utterance_id')
+                                         media=str(loc)), pk='utterance_id')
 
             for word in words:
                 if not word in lexicon:
@@ -116,6 +117,8 @@ if __name__ == '__main__':
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--lexicon', action='store_true',
                         help='generate lexicon for every word using ukro-g2p')
+    parser.add_argument('--copy-wav', action='store_true',
+                        help='copy wav files from the dataset (useful if the paths are relative and make_mfcc fails to find them later on)')
     parser.add_argument('--dataset', default='mozilla-foundation/common_voice_10_0',
                         help='dataset name on Hugging Face')
     parser.add_argument('--subset', default='uk',
@@ -141,4 +144,4 @@ if __name__ == '__main__':
     else:
         g2p = None
 
-    prepare(uk, datadir, g2p=g2p, alphabet=args.alphabet)
+    prepare(uk, datadir, g2p=g2p, alphabet=args.alphabet, copy_wav=args.copy_wav)
