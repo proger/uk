@@ -4,6 +4,7 @@ Transduce graphemes to phonemes
 
 import os
 import warnings
+from pathlib import Path
 from typing import Sequence, Mapping, Callable
 
 from loguru import logger
@@ -12,6 +13,8 @@ warnings.warn('Setting CUDA_VISIBLE_DEVICES="" due to bug in ukro-g2p==0.1.5')
 os.environ['CUDA_VISIBLE_DEVICES'] = ''
 
 from ukro_g2p.predict import G2P
+
+from uk.prepare_dict import read_lexicon
 
 __all__ = ['g2p', 'g2p_batch', 'G2PBatched']
 
@@ -27,6 +30,13 @@ replacements = {
     'F3': 'F', # баффало
     'B23': 'B2', # оббігав
     'X3': 'X', # ваххабіт
+    'K3': 'K',
+    'P3': 'P',
+    'TS3': 'TS',
+    'Y3': 'Y',
+    'B3': 'B',
+    'ZJ3': 'ZJ',
+    'ZH3': 'ZH',
 }
 
 

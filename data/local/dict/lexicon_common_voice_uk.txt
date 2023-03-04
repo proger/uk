@@ -723,9 +723,9 @@
 безділля B EIH ZJ DJ IY LJ3 AA1
 бездітним B EIH ZJ DJ IY1 T N IHE M
 бездіяльністю B EIH ZJ DJ IY Y AA1 LJ NJ IY SJ TJ UH
-безжально B EIH ZH3 AA1 LJ N AO
-безжалісний B EIH ZH3 AA1 LJ IY S N IH Y
-безжурність B EIH ZH3 UH1 R NJ IY SJ TJ
+безжально B EIH ZH AA1 LJ N AO
+безжалісний B EIH ZH AA1 LJ IY S N IH Y
+безжурність B EIH ZH UH1 R NJ IY SJ TJ
 беззаперечна B EIH Z3 AA P EIH R EH1 CH N AA
 беззастережно B EIH Z3 AA S T EIH R EH1 ZH N AO
 беззубий B EIH Z3 UH1 B IH Y
@@ -2630,7 +2630,7 @@
 виношу V IH1 N AO SH UH
 винуватим V IHE N UH V AA1 T IHE M
 винувато V IHE N UH V AA1 T AO
-винуватцем V IHE N UH V AA1 TS3 EIH M
+винуватцем V IHE N UH V AA1 TS EIH M
 винцем V IH1 N TS EIH M
 винюхали V IH1 NJ UH X AA L IHE
 винюхає V IH1 NJ UH X AA Y EIH
@@ -9629,8 +9629,8 @@
 зернова Z EIH R N AO V AA1
 зернові Z EIH R N AO1 V2 IY
 зерня Z EIH R NJ AA1
-зживуть ZH3 IHE V UH1 TJ
-зжила ZH3 IHE L AA1
+зживуть ZH IHE V UH1 TJ
+зжила ZH IHE L AA1
 ззаду Z AA1 D UH
 ззаді Z AA1 DJ IY
 ззиває Z3 IHE V AA1 Y EIH
@@ -13170,7 +13170,7 @@
 марнує M AA R N UH1 Y EIH
 маро M AA1 R AO
 мародерів M AA R AO D EH1 RJ IY WH
-марокканця M AA R AO K3 AA1 NJ TSJ AA
+марокканця M AA R AO K AA1 NJ TSJ AA
 марсо M AA1 R S AO
 мартин M AA R T IH1 N
 мартопляс M AA R T AO P LJ AA1 S
@@ -13359,7 +13359,7 @@
 межі M EIH ZH2 IY1
 мезап M EIH Z AA1 P
 мезентія M EIH Z EH1 N TJ IY Y AA
-мекка M EH1 K3 AA
+мекка M EH1 K AA
 мексиканця M EIH K S IHE K AA1 NJ TSJ AA
 меле M EH1 L EIH
 мелодичного M EIH L AO D IH1 CH N AO H AO
@@ -14696,7 +14696,7 @@
 найшло N AA Y SH L AO1
 найшов N AA Y SH AO1 WH
 найщиріше N AA Y SH CH IHE RJ IY1 SH EIH
-найяскравіших N AA Y3 AA S K R AA V2 IY1 SH IHE X
+найяскравіших N AA Y AA S K R AA V2 IY1 SH IHE X
 найімовірніше N AA V2 IY M AOU V2 IY1 R NJ IY SH EIH
 наказ N AA K AA1 Z
 наказав N AA K AA Z AA1 WH
@@ -16008,7 +16008,7 @@
 об'їхати AO B Y IY1 X AA T IHE
 обабіч AO B AA1 B2 IY CH
 обами AO1 B AA M IHE
-оббитих AO B3 IH1 T IHE X
+оббитих AO B IH1 T IHE X
 обв'язали AO B V Y AA Z AA1 L IHE
 обвал AO B V AA1 L
 обведена AO B V EH1 D EIH N AA
@@ -19546,7 +19546,7 @@
 порожніли P AO R AOU ZH NJ IY1 L IHE
 порожніми P AO R AOU ZH NJ IY1 M IHE
 порозбігалися P AO R AO Z B2 IY H AA1 L IHE SJ AA
-пороззявляли P AO R AO ZJ3 AA WH LJ AA1 L IHE
+пороззявляли P AO R AO ZJ AA WH LJ AA1 L IHE
 порозмовлявши P AO R AO Z M AO WH LJ AA1 WH SH IHE
 порозпускав P AO R AO Z P UH S K AA1 WH
 порозтинав P AO R AO Z T IHE N AA1 WH
@@ -22785,16 +22785,16 @@
 розділом R AO1 ZJ DJ IY L AO M
 розділі R AO1 ZJ DJ IY LJ IY
 розеток R AO Z EH1 T AO K
-розженешся R AO ZH3 EIH N EH1 SJ3 AA
-розжену R AO ZH3 EIH N UH1
+розженешся R AO ZH EIH N EH1 SJ3 AA
+розжену R AO ZH EIH N UH1
 роззброєння R AO Z3 B R AO1 Y EIH NJ3 AA
 роззброїли R AO Z3 B R AO1 Y IY L IHE
 роззброїти R AO Z3 B R AO1 Y IY T IHE
 роззброїтися R AO Z3 B R AO1 Y IY T IHE SJ AA
 роззирнувся R AO Z3 IHE R N UH1 WH SJ AA
 роззухвалюються R AO Z3 UH X V AA1 LJ UH Y UH TSJ3 AA
-роззяве R AO ZJ3 AA1 V EIH
-роззявивши R AO ZJ3 AA1 V IHE WH SH IHE
+роззяве R AO ZJ AA1 V EIH
+роззявивши R AO ZJ AA1 V IHE WH SH IHE
 розкаже R AO S K AA1 ZH EIH
 розкажем R AO S K AA1 ZH EIH M
 розкажи R AO S K AA ZH IH1
@@ -27912,7 +27912,7 @@
 фільмів F2 IY1 LJ M2 IY WH
 фільтр F2 IY LJ T R
 філігранно F2 IY LJ IY H R AA1 N3 AO
-філіппіка F2 IY LJ IY1 P3 IY K AA
+філіппіка F2 IY LJ IY1 P IY K AA
 фіму F2 IY1 M UH
 фіналом F2 IY N AA1 L AO M
 фінальну F2 IY N AA1 LJ N UH
@@ -29933,7 +29933,7 @@
 із ZJ IY Z
 ізвелів IY Z V EH1 LJ IY WH
 ізволу IY Z V AO1 L UH
-ізжени IY ZH3 EH1 N IHE
+ізжени IY ZH EH1 N IHE
 ізняв IY ZJ NJ AA1 WH
 ізні IY ZJ NJ IY1
 ізоляція IY Z AO LJ AA1 TSJ IY Y AA
