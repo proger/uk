@@ -18,7 +18,7 @@ setuptools.setup(
         "datasets",
         "kaldiio",
         "loguru",
-        "praatio",
+        "praatio<6.0.0",
         "soundfile",
         "sqlite_utils",
         "torch",
