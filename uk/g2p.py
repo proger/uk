@@ -38,6 +38,7 @@ replacements = {
     'B3': 'B',
     'ZJ3': 'ZJ',
     'ZH3': 'ZH',
+    'P23': 'P2', # філіппінський
 }
 
 _, reference_lexicon = read_lexicon(Path(__file__).parent / '../data/local/dict/lexicon_common_voice_uk.txt')
