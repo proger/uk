@@ -3,5 +3,4 @@
 __pycache__/
 data/cv_train/
 data/
-exp/
 wandb/
