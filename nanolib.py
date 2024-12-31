@@ -1,3 +1,4 @@
+from pathlib import Path
 import matplotlib.pyplot as plt
 from pydub import AudioSegment
 import numpy as np
@@ -96,11 +97,15 @@ def cmvn(frames):
     frames = frames / np.std(frames, axis=0, keepdims=True)
     return frames
 
-def extract_mfcc(key):
-    audio = load(wav_dir / f'{key}.mp3')
-    waveform = to_samples(audio)
-    x = mfcc(waveform)
-    return x
+def extract_mfcc(key, wav_dir=Path('wav')):
+    try:
+        audio = load(wav_dir / f'{key}.mp3')
+        waveform = to_samples(audio)
+        x = mfcc(waveform)
+        return x
+    except Exception as e:
+        import sys
+        print(e, file=sys.stderr)
 
 def index_symbols(lines):
     return {c: i for i, c in enumerate(sorted(set([c for line in lines for c in line])))}
@@ -118,13 +123,14 @@ def estimate_bigrams(lines, symbols, bias=0):
     counts = counts / np.sum(counts, axis=1, keepdims=True)
     return counts
 
-def draw_alignment(ax, durations, labels):    
+def draw_alignment(durations, labels, ax=None):
+    if ax is None:
+        ax = plt.gca()
     start = 0
     for i, duration in enumerate(durations):
         ax.axvline(duration, alpha=0.5)
         length = duration - start
-        #ax.text(start + length/2, -1.1, labels[i])
-        ax.text(start, -1.1, labels[i])
+        ax.text(start + length/2, -1.1, labels[i])
         start = duration
 
 def stoch_round(x):
@@ -159,7 +165,6 @@ def logprob(x, mean, precision, weights=None, renormalize_weights=True, agg=True
             return logsumexp(log_prob[:, None, :] + np.log(weights)) # nm
         else:
             return log_prob[:, None, :] + np.log(weights) # nmk
-
 
 def decode(obs, init, trans):
     "tm,m,mk->t"
@@ -367,7 +372,7 @@ def lbg(train, eval, num_clusters=16384):
         ])
 
         loss = vq_loss(perturbed_codebook, eval)
-        refine_losses, refine_utils, codebook = kmeans(perturbed_codebook, train, eval)
+        refine_losses, refine_utils, train_util, codebook = kmeans(perturbed_codebook, train, eval)
         losses.extend(refine_losses)
         utils.extend(refine_utils)
         k = len(codebook)

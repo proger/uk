@@ -2,16 +2,17 @@
 import matplotlib.pyplot as plt
 from pathlib import Path
 import numpy as np
-
 from nanolib import *
 
-wav_dir = Path('wav')
-transcripts = read_table(Path('data/mozilla-foundation/common_voice_10_0/uk/train/text'), max_length=30)
+
+transcripts = read_table(Path('data/mozilla-foundation/common_voice_10_0/uk/train/text'))
 train_keys = list(transcripts.keys())
 
-
 #%%
-segments = thread_map(extract_mfcc, train_keys)
+#segments = thread_map(extract_mfcc, train_keys)
+segments = [extract_mfcc(key) for key in tqdm(train_keys)]
+#with ThreadPoolExecutor() as executor:
+#    segments = list(executor.map(extract_mfcc, train_keys))
 frames = np.concatenate(segments, axis=0).astype(np.float32)
 durations = np.array([x.shape[0] for x in segments])
 
@@ -37,7 +38,7 @@ transcript_tab = np.loadtxt('exp/transcripts.txt', dtype=str)
 np.random.seed(32)
 perm = np.random.permutation(len(frames))
 train, eval = frames[perm[:-10000]], frames[perm[-10000:]]
-num_clusters = 16384
+num_clusters = 1024
 best_seed = 34
 
 #%%
