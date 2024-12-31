@@ -1,4 +1,5 @@
 #%%
+import argparse
 try:
     import matplotlib; matplotlib.use("kitcat")
 except ValueError:
@@ -16,18 +17,6 @@ def dedup(x):
     mask = np.concatenate(([True], x[1:] != x[:-1]))
     return ''.join(x[mask])
 
-frames = np.load('exp/frames.npy').astype(np.float32)
-frames = cmvn(frames)
-durations = np.load('exp/file_durations.npy')
-transcript_tab = np.loadtxt('exp/transcripts.txt', dtype=str)
-#codebook = np.load('exp/codebook16384.npy')
-codebook = np.load('exp/codebook1024.npy')
-
-np.random.seed(32)
-frame_permutation = np.random.permutation(len(frames))
-train = frames[frame_permutation[:10000]]
-precision = 1/np.mean((train[None, :, :] - codebook[:, None, :])**2, axis=1)
-
 def make_chain(state_sequence, num_frames):
     num_states = len(state_sequence)
     id_weight = -num_states/num_frames + 1
@@ -36,17 +25,44 @@ def make_chain(state_sequence, num_frames):
     chain[-1, -1] = 1 # terminal state
     return chain
 
+def parse_args():
+    parser = argparse.ArgumentParser(description="Process audio and label for the example.")
+    parser.add_argument('--path', type=str, help='Path to the MP3 file.')
+    parser.add_argument('--label', type=str, default='common_voice_uk_27626906',
+                        help='Label text.')
+    return parser.parse_args()
+
 #%%
 
-example_id = np.where(transcript_tab[:, 0] == 'common_voice_uk_27626906')[0].item()
-cumulative_durations = np.cumsum(durations)
-example = frames[cumulative_durations[example_id-1]:cumulative_durations[example_id]]
+args = parse_args()
+frames = np.load('exp/frames.npy').astype(np.float32)
+frames = cmvn(frames)
+#codebook = np.load('exp/codebook16384.npy')
+codebook = np.load('exp/codebook1024.npy')
+transcript_tab = np.loadtxt('exp/transcripts.txt', dtype=str)
 symbols = index_symbols(transcript_tab[:, 1])
-label = str(transcript_tab[example_id, 1])
 
-path = 'wav/' + str(transcript_tab[example_id, 0]) + '.mp3'
-audio = AudioSegment.from_mp3(path)
+if not args.path:
+    durations = np.load('exp/file_durations.npy')
+
+    example_id = np.where(transcript_tab[:, 0] == args.label)[0].item()
+    cumulative_durations = np.cumsum(durations)
+    example = frames[cumulative_durations[example_id-1]:cumulative_durations[example_id]]
+    label = str(transcript_tab[example_id, 1])
+    path = 'wav/' + str(transcript_tab[example_id, 0]) + '.mp3'
+    audio = load(path)
+else:
+    path = args.path
+    label = encode_text(args.label)
+    audio = AudioSegment.from_mp3(path)
+    example = cmvn(extract_mfcc(path))
+
 #display(audio)
+
+np.random.seed(32)
+frame_permutation = np.random.permutation(len(frames))
+train = frames[frame_permutation[:10000]]
+precision = 1/np.mean((train[None, :, :] - codebook[:, None, :])**2, axis=1)
 
 symbol_list = [symbol for symbol, _ in sorted(symbols.items(), key=lambda item: item[1])]
 
@@ -65,7 +81,7 @@ pi0 = np.ones((len(trans), len(codebook))) / len(codebook)
 
 init = np.eye(len(trans))[0]
 pi = pi0
-for step in range(30):
+for step in range(40):
     comp = logprob(example, codebook, precision, pi, agg=False, renormalize_weights=False) # component logits: nkm
     obs = np.exp(logsumexp(comp)) # mixture probability: nk
     p_comp = np.exp(comp) # component probabilities
@@ -92,21 +108,25 @@ for step in range(30):
         
         plt.show()
         plt.close(fig)
+    if step > 30:
+        trans = 0.99 * trans + 0.01 * trans1
 
     pi_c = np.sum(response * post[:, :, None] , axis=0)
     #pi_c = np.clip(pi_c, 1e-32, 1)
-    pi = pi_c / np.sum(post, axis=0)[:, None]
-    pi = pi_sim @ pi
+    pi1 = pi_c / np.sum(post, axis=0)[:, None]
+    pi1 = pi_sim @ pi1
     print(-np.sum(pi * np.log(pi), axis=1), 'mixture entropies')
+    pi = pi1
 
     #print(np.sum(pi, axis=1), 'pi sums must be ones')
 
-fig, ax = plt.subplots(1, 1, figsize=(24, 6))
-ax.matshow(example.T, aspect='auto')
-states = decode(obs, init, trans)
-ali = np.cumsum(np.unique(states, return_counts=True)[1])
-draw_alignment(ali, label_with_repeats, ax=ax)
-ax.set_xticks([])
-print('state durations:', ali)
-plt.show()
-plt.close(fig)
+    if step % 10 == 9:
+        fig, ax = plt.subplots(1, 1, figsize=(24, 6))
+        ax.matshow(example.T, aspect='auto')
+        states = decode(obs, init, trans)
+        ali = np.cumsum(np.unique(states, return_counts=True)[1])
+        draw_alignment(ali, label_with_repeats, ax=ax)
+        ax.set_xticks([])
+        print('state durations:', ali)
+        plt.show()
+        plt.close(fig)

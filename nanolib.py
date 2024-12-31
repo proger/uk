@@ -28,7 +28,7 @@ def to_samples(audio, normalize=True):
         samples = samples / np.max(samples)
     return samples
 
-def rewrite_text(s):
+def encode_text(s):
     return SPACE + SPACE.join(s.split(' ')) + SPACE
 
 def read_table(file_path, skip=0, max_length=10000):
@@ -38,7 +38,7 @@ def read_table(file_path, skip=0, max_length=10000):
             if i < skip:
                 continue
             key, text = line.strip().split(maxsplit=1)
-            text = rewrite_text(text)
+            text = encode_text(text)
             if len(text) < max_length:
                 entries[key] = text
     return entries
@@ -98,14 +98,10 @@ def cmvn(frames):
     return frames
 
 def extract_mfcc(key, wav_dir=Path('wav')):
-    try:
-        audio = load(wav_dir / f'{key}.mp3')
-        waveform = to_samples(audio)
-        x = mfcc(waveform)
-        return x
-    except Exception as e:
-        import sys
-        print(e, file=sys.stderr)
+    audio = load(Path(key) if Path(key).exists() else wav_dir / f'{key}.mp3')
+    waveform = to_samples(audio)
+    x = mfcc(waveform)
+    return x
 
 def index_symbols(lines):
     return {c: i for i, c in enumerate(sorted(set([c for line in lines for c in line])))}
