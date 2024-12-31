@@ -4,6 +4,7 @@ try:
 except ValueError:
     pass
 import matplotlib.pyplot as plt
+plt.style.use('dark_background')
 from pydub import AudioSegment
 import numpy as np
 from IPython.display import display
@@ -45,7 +46,7 @@ label = str(transcript_tab[example_id, 1])
 
 path = 'wav/' + str(transcript_tab[example_id, 0]) + '.mp3'
 audio = AudioSegment.from_mp3(path)
-display(audio)
+#display(audio)
 
 symbol_list = [symbol for symbol, _ in sorted(symbols.items(), key=lambda item: item[1])]
 
@@ -77,15 +78,17 @@ for step in range(30):
     loss, post, trans1, alpha = state_posterior(obs, init, trans)
     if step % 1 == 0:
         fig, (ax, axr) = plt.subplots(1, 2, figsize=(24, 6))
-        ax.matshow(post.T, aspect='auto')
-        #ax.matshow(alpha.T, aspect='auto')
+        #ax.matshow(post.T, aspect='auto')
+        ax.matshow(alpha.T, aspect='auto')
         #ax.set_xticks(ticks=gt_ends)
-        ax.set_yticks(ticks=np.arange(len(label)*state_repeats), labels=''.join(l*state_repeats for l in label), fontsize=8)
-        ax.set_title(f'{step=} posterior for {label} {loss=:.07}')
+        ax.set_yticks(ticks=np.arange(len(label)*state_repeats), labels=''.join(l*state_repeats for l in label), fontsize=14)
+        #ax.set_title(f'{step=} posterior for {label} {loss=:.07}')
+        ax.set_title(f'{step=} forward variables for {label} {loss=:.07}')
 
-        axr.set_xticks(ticks=np.arange(len(label)*state_repeats), labels=''.join(l*state_repeats for l in label), fontsize=8)
-        axr.set_yticks(ticks=np.arange(len(label)*state_repeats), labels=''.join(l*state_repeats for l in label), fontsize=8)
+        axr.set_xticks(ticks=np.arange(len(label)*state_repeats), labels=''.join(l*state_repeats for l in label), fontsize=14)
+        axr.set_yticks(ticks=np.arange(len(label)*state_repeats), labels=''.join(l*state_repeats for l in label), fontsize=14)
         axr.matshow(trans1, aspect='auto')
+        axr.set_title('transition posterior')
         
         plt.show()
         plt.close(fig)
@@ -94,13 +97,16 @@ for step in range(30):
     #pi_c = np.clip(pi_c, 1e-32, 1)
     pi = pi_c / np.sum(post, axis=0)[:, None]
     pi = pi_sim @ pi
+    print(-np.sum(pi * np.log(pi), axis=1), 'mixture entropies')
 
-    print(np.sum(pi, axis=1), 'pi sums must be ones')
+    #print(np.sum(pi, axis=1), 'pi sums must be ones')
 
-plt.figure()
-plt.matshow(example.T, aspect='auto')
+fig, ax = plt.subplots(1, 1, figsize=(24, 6))
+ax.matshow(example.T, aspect='auto')
 states = decode(obs, init, trans)
 ali = np.cumsum(np.unique(states, return_counts=True)[1])
-draw_alignment(ali, label_with_repeats)
-print(ali)
+draw_alignment(ali, label_with_repeats, ax=ax)
+ax.set_xticks([])
+print('state durations:', ali)
 plt.show()
+plt.close(fig)

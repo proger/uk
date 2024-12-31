@@ -128,7 +128,7 @@ def draw_alignment(durations, labels, ax=None):
         ax = plt.gca()
     start = 0
     for i, duration in enumerate(durations):
-        ax.axvline(duration, alpha=0.5)
+        ax.axvline(duration, alpha=1, color='red', lw=3)
         length = duration - start
         ax.text(start + length/2, -1.1, labels[i])
         start = duration
@@ -259,7 +259,7 @@ def state_posterior(obs, init, trans):
 
     log_loss = -np.sum(np.log(ca))
     
-    return log_loss, state_post, new_trans
+    return log_loss, state_post, new_trans, alpha
 
 
 def test_state_posterior():
