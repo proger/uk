@@ -6,9 +6,7 @@ except ValueError:
     pass
 import matplotlib.pyplot as plt
 plt.style.use('dark_background')
-from pydub import AudioSegment
 import numpy as np
-from IPython.display import display
 
 from nanolib import *
 
@@ -36,13 +34,14 @@ def is_jupyter():
 
 def parse_args():
     if is_jupyter():
-        return argparse.Namespace(label='common_voice_uk_27626906', path=None, uber=None)
+        return argparse.Namespace(key='common_voice_uk_27626906', label=None, uber=None, steps=10, viz=True)
 
     parser = argparse.ArgumentParser(description="Process audio and label for the example.")
     parser.add_argument('--uber', type=str, help='Path to the uber_pi file.')
-    parser.add_argument('--path', type=str, help='Path to the MP3 file.')
-    parser.add_argument('--label', type=str, default='common_voice_uk_27626906',
-                        help='Label text.')
+    parser.add_argument('--label', type=str)
+    parser.add_argument('--key', type=str, nargs='+', default='common_voice_uk_27626906')
+    parser.add_argument('--steps', type=int, default=10)
+    parser.add_argument('--viz', action='store_true')
     return parser.parse_args()
 
 #%%
@@ -52,103 +51,112 @@ frames = np.load('exp/frames.npy').astype(np.float32)
 frames = cmvn(frames)
 #codebook = np.load('exp/codebook16384.npy')
 codebook = np.load('exp/codebook1024.npy')
+cumulative_durations = np.cumsum(np.load('exp/file_durations.npy'))
 transcript_tab = np.loadtxt('exp/transcripts.txt', dtype=str)
 symbols = index_symbols(transcript_tab[:, 1])
-
-if not args.path:
-    durations = np.load('exp/file_durations.npy')
-
-    example_id = np.where(transcript_tab[:, 0] == args.label)[0].item()
-    cumulative_durations = np.cumsum(durations)
-    label = str(transcript_tab[example_id, 1])
-    path = 'wav/' + str(transcript_tab[example_id, 0]) + '.mp3'
-    audio = load(path)
-    example = frames[cumulative_durations[example_id-1]:cumulative_durations[example_id]]
-else:
-    path = args.path
-    label = encode_text(args.label)
-    audio = AudioSegment.from_mp3(path)
-    example = cmvn(extract_mfcc(path))
-
-#display(audio)
-
 np.random.seed(32)
 frame_permutation = np.random.permutation(len(frames))
 train = frames[frame_permutation[:10000]]
 precision = 1/np.mean((train[None, :, :] - codebook[:, None, :])**2, axis=1)
-
 symbol_list = [symbol for symbol, _ in sorted(symbols.items(), key=lambda item: item[1])]
+print('symbols', symbol_list)
 
-state_repeats = 1
-label_with_repeats = ''.join([l*state_repeats for l in label])
-state_chain = [symbols[s] for s in label for rep in range(state_repeats)]
-trans = make_chain(state_chain, len(example))
+def take_example(key, state_repeats=1, _cache={}):
+    if key in _cache:
+        return _cache[key]
+
+    if Path(key).exists():
+        path = args.path
+        label = encode_text(args.label)
+        example = cmvn(extract_mfcc(path))
+    else:
+        example_id = np.where(transcript_tab[:, 0] == key)[0].item()
+        label = str(transcript_tab[example_id, 1])
+        path = 'wav/' + str(transcript_tab[example_id, 0]) + '.mp3'
+        example = frames[cumulative_durations[example_id-1]:cumulative_durations[example_id]]
+
+    state_repeats = 1
+    label = ''.join([l*state_repeats for l in label])
+    state_chain = [symbols[s] for s in label for rep in range(state_repeats)]
+    trans = make_chain(state_chain, len(example))
+    init = np.eye(len(trans))[0]
+
+    pi_sim = np.triu(np.float32(np.array(state_chain)[None, :] == np.array(state_chain)[:, None]))
+    pi_sim = pi_sim / np.sum(pi_sim, axis=1, keepdims=True)
+
+    uber_to_local = np.eye(len(symbols))[state_chain]
+    #print(uber_to_local, state_chain)
+    uber_to_local = uber_to_local / np.sum(uber_to_local, axis=1, keepdims=True)
+
+    _cache[key] = (example, init, trans, state_chain, pi_sim, label, uber_to_local)
+    return _cache[key]
+
 
 if args.uber:
     uber_pi = np.load(args.uber)
 else:
-    uber_pi = np.ones((len(symbols), len(codebook))) / len(codebook)
-uber_to_local = np.triu(np.eye(len(symbols))[state_chain])
-uber_to_local = uber_to_local / np.sum(uber_to_local, axis=1, keepdims=True)
+    uber_pi = 10 * np.random.rand(len(symbols), len(codebook))
+    uber_pi = uber_pi / np.sum(uber_pi, axis=1, keepdims=True)
 
-pi_sim = np.triu(np.float32(np.array(state_chain)[None, :] == np.array(state_chain)[:, None]))
-pi_sim = pi_sim / np.sum(pi_sim, axis=1, keepdims=True)
+for step in range(args.steps):
+    update = np.zeros_like(uber_pi)
+    agg_loss = 0
 
-# codebook = example
-# precision = 1/np.mean((codebook[None, :, :] - codebook[:, None, :])**2, axis=1)
+    for key in args.key:
+        example, init, trans, state_chain, pi_sim, label, uber_to_local = take_example(key)
 
-init = np.eye(len(trans))[0]
-for step in range(40):
-    local_pi = uber_to_local @ uber_pi
+        local_pi = uber_to_local @ uber_pi
 
-    comp = logprob(example, codebook, precision, local_pi, agg=False, renormalize_weights=False) # component logits: nkm
-    obs = np.exp(logsumexp(comp)) # mixture probability: nk
-    p_comp = np.exp(comp) # component probabilities
-    response = p_comp / obs[:, :, None] # component responsibilities: nkm
+        comp = logprob(example, codebook, precision, local_pi, agg=False, renormalize_weights=False) # component logits: nkm
+        obs_logits = logsumexp(comp) # mixture logits: nk
+        response = np.exp(comp - obs_logits[:, :, None]) # component responsibilities: nkm
+        obs = np.exp(obs_logits)
 
-    decoded = dedup([symbol_list[state_chain[i]] for i in decode(obs, init, trans)])
-    #print('decoded', decoded)
+        # state occupancy posterior
+        loss, post, trans1, alpha = state_posterior(obs, init, trans)
+        if args.viz and step % 1 == 0:
+            decoded = dedup([symbol_list[state_chain[i]] for i in decode(obs, init, trans)])
+            #print('decoded', decoded)
 
-    # state occupancy posterior
-    loss, post, trans1, alpha = state_posterior(obs, init, trans)
-    if step % 1 == 0:
-        fig, (ax, axr) = plt.subplots(1, 2, figsize=(24, 6))
-        #ax.matshow(post.T, aspect='auto')
-        ax.matshow(alpha.T, aspect='auto')
-        #ax.set_xticks(ticks=gt_ends)
-        ax.set_yticks(ticks=np.arange(len(label)*state_repeats), labels=''.join(l*state_repeats for l in label), fontsize=14)
-        #ax.set_title(f'{step=} posterior for {label} {loss=:.07}')
-        ax.set_title(f'{step=} forward variables for {label} {loss=:.07}')
+            states = decode(obs, init, trans)
+            ali = np.cumsum(np.unique(states, return_counts=True)[1])
 
-        axr.set_xticks(ticks=np.arange(len(label)*state_repeats), labels=''.join(l*state_repeats for l in label), fontsize=14)
-        axr.set_yticks(ticks=np.arange(len(label)*state_repeats), labels=''.join(l*state_repeats for l in label), fontsize=14)
-        axr.matshow(trans1, aspect='auto')
-        axr.set_title('transition posterior')
-        
-        plt.show()
-        plt.close(fig)
-    if step > 30:
-        trans = 0.99 * trans + 0.01 * trans1
+            fig, (ax, axr, axa, axo) = plt.subplots(1, 4, figsize=(24, 6))
+            #ax.matshow(post.T, aspect='auto')
+            ax.matshow(alpha.T, aspect='auto')
+            ax.set_yticks(ticks=np.arange(len(label)), labels=label, fontsize=14)
+            ax.set_title(f'{step=} forward for {label} {loss=:.07}')
 
-    local_pi_c = np.sum(response * post[:, :, None] , axis=0)
-    #pi_c = np.clip(pi_c, 1e-32, 1)
-    local_pi1 = local_pi_c / np.sum(post, axis=0)[:, None]
-    local_pi1 = pi_sim @ local_pi1 # redistribute between common symbols in a sequence
-    print(-np.sum(local_pi1 * np.log(local_pi1), axis=1), 'mixture entropies')
+            axr.set_xticks(ticks=np.arange(len(label)), labels=label, fontsize=14)
+            axr.set_yticks(ticks=np.arange(len(label)), labels=label, fontsize=14)
+            axr.matshow(np.log(trans1 + 1e-12), aspect='auto')
+            axr.set_title('trans')
 
-    uber_pi = 0.9 * uber_pi + 0.1 * (uber_to_local.T @ local_pi1)
+            axa.matshow(example.T, aspect='auto')
+            draw_alignment(ali, label, ax=axa, yloc=1.0)
+            axa.set_title(f'ali {ali}')
 
-    #print(np.sum(pi, axis=1), 'pi sums must be ones')
+            axo.matshow(obs.T, aspect='auto')
+            axo.set_title('obs')
 
-    if step % 10 == 9 or step == 0:
-        fig, ax = plt.subplots(1, 1, figsize=(24, 6))
-        ax.matshow(example.T, aspect='auto')
-        states = decode(obs, init, trans)
-        ali = np.cumsum(np.unique(states, return_counts=True)[1])
-        draw_alignment(ali, label_with_repeats, ax=ax)
-        ax.set_xticks([])
-        print('state durations:', ali)
-        plt.show()
-        plt.close(fig)
+            plt.tight_layout()
+            plt.show()
+            plt.close(fig)
+        if step > 30:
+            trans = 0.99 * trans + 0.01 * trans1
+
+        local_pi_c = np.sum(response * post[:, :, None] , axis=0)
+        local_pi1 = local_pi_c / np.sum(post, axis=0)[:, None]
+        local_pi1 = pi_sim @ local_pi1 # redistribute between common symbols in a sequence
+        #print(key, -np.sum(local_pi1 * np.log(local_pi1), axis=1), 'mixture entropies', 'step', step)
+
+        update += uber_to_local.T @ local_pi1
+        agg_loss += loss
+
+        assert np.allclose(np.sum(local_pi1, axis=1), 1)
+
+    uber_pi = update / len(args.key)
+    loss = agg_loss / len(args.key)
+    print('step', step, 'loss', loss)
 
 np.save('exp/uber_pi.npy', uber_pi)

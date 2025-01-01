@@ -119,14 +119,15 @@ def estimate_bigrams(lines, symbols, bias=0):
     counts = counts / np.sum(counts, axis=1, keepdims=True)
     return counts
 
-def draw_alignment(durations, labels, ax=None):
+def draw_alignment(durations, labels, ax=None, yloc=-1.1):
     if ax is None:
         ax = plt.gca()
     start = 0
     for i, duration in enumerate(durations):
         ax.axvline(duration, alpha=1, color='red', lw=3)
         length = duration - start
-        ax.text(start + length/2, -1.1, labels[i])
+        #ax.text(start + length/2, yloc, labels[i])
+        ax.text(start, yloc, labels[i])
         start = duration
 
 def stoch_round(x):
