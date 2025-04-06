@@ -142,8 +142,8 @@ def durations1(labels, duration):
     return np.cumsum(stoch_round([duration / len(labels)]*len(labels)))
 
 def logsumexp(x, axis=-1, keepdims=False):
-    max = np.max(x, axis=axis, keepdims=False)
-    x = np.exp(x - max[..., None])
+    max = np.max(x, axis=axis, keepdims=keepdims)
+    x = np.exp(x - (max[..., None] if keepdims == False else max))
     return np.log(np.sum(x, axis=axis, keepdims=keepdims)) + max
 
 def logprob(x, mean, precision, weights=None, renormalize_weights=True, agg=True):
@@ -318,6 +318,7 @@ def kmeans(codebook, train, eval, max_steps=20, batch_size=32768, lr=0.1, revive
     train_util = np.ones(len(codebook))
     train_p = train_util / train_util.sum()
     train_ent = -np.sum(train_p * np.log(train_p))
+    print('loss util entropy')
     print(loss, util, train_ent)
 
     for step in range(max_steps):
@@ -334,7 +335,7 @@ def kmeans(codebook, train, eval, max_steps=20, batch_size=32768, lr=0.1, revive
 
         train_p = train_util / train_util.sum()
         train_ent = -np.sum(train_p * np.log(train_p))
-        print(train_util)
+        #print(train_util)
 
         loss, util = vq_loss(codebook, eval)
         eval_losses.append(loss)
@@ -360,8 +361,10 @@ def lbg(train, eval, num_clusters=16384):
     print(k, 'init loss', loss, 'util', util)
 
     while k < num_clusters:
-        plt.matshow(codebook.T, aspect='auto')
+        fig, ax = plt.subplots(1, 1, figsize=(20, 8))
+        ax.matshow(codebook.T, aspect='auto')
         plt.show()
+        plt.close(fig)
 
         perturbed_codebook = np.vstack([
             codebook * 1.1,
@@ -373,7 +376,7 @@ def lbg(train, eval, num_clusters=16384):
         losses.extend(refine_losses)
         utils.extend(refine_utils)
         k = len(codebook)
-        print(k, 'refined loss', losses[-1], 'util', utils[-1])
+        print('k', k, 'refined loss', losses[-1], 'util', utils[-1])
     return losses, utils, codebook
 
 

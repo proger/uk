@@ -34,14 +34,17 @@ def is_jupyter():
 
 def parse_args():
     if is_jupyter():
-        return argparse.Namespace(key='common_voice_uk_27626906', label=None, uber=None, steps=10, viz=True)
+        return argparse.Namespace(key=['common_voice_uk_27626906'], label=None, uber=None, steps=10, show=True, codebook_size=512)
 
     parser = argparse.ArgumentParser(description="Process audio and label for the example.")
-    parser.add_argument('--uber', type=str, help='Path to the uber_pi file.')
+    parser.add_argument('--uber', type=str, help='Path to the pretrained uber_pi file.')
     parser.add_argument('--label', type=str)
-    parser.add_argument('--key', type=str, nargs='+', default='common_voice_uk_27626906')
+    parser.add_argument('--key', type=str, nargs='+', default=['common_voice_uk_27626906'])
     parser.add_argument('--steps', type=int, default=10)
-    parser.add_argument('--viz', action='store_true')
+    parser.add_argument('--show', action='store_true')
+    parser.add_argument('-t', '--time_factor', type=float, default=1, help='make_chain duration factor')
+    parser.add_argument('-k', '--codebook_size', type=int, help='Codebook size', default=512)
+    parser.add_argument('-o', '--output', type=str, help='Path to the output file.')
     return parser.parse_args()
 
 #%%
@@ -49,8 +52,7 @@ def parse_args():
 args = parse_args()
 frames = np.load('exp/frames.npy').astype(np.float32)
 frames = cmvn(frames)
-#codebook = np.load('exp/codebook16384.npy')
-codebook = np.load('exp/codebook1024.npy')
+codebook = np.load(f'exp/codebook{args.codebook_size}.npy')
 cumulative_durations = np.cumsum(np.load('exp/file_durations.npy'))
 transcript_tab = np.loadtxt('exp/transcripts.txt', dtype=str)
 symbols = index_symbols(transcript_tab[:, 1])
@@ -78,7 +80,8 @@ def take_example(key, state_repeats=1, _cache={}):
     state_repeats = 1
     label = ''.join([l*state_repeats for l in label])
     state_chain = [symbols[s] for s in label for rep in range(state_repeats)]
-    trans = make_chain(state_chain, len(example))
+    trans = make_chain(state_chain, len(example)*args.time_factor)
+    print(trans, 'transition matrix')
     init = np.eye(len(trans))[0]
 
     pi_sim = np.triu(np.float32(np.array(state_chain)[None, :] == np.array(state_chain)[:, None]))
@@ -109,12 +112,12 @@ for step in range(args.steps):
 
         comp = logprob(example, codebook, precision, local_pi, agg=False, renormalize_weights=False) # component logits: nkm
         obs_logits = logsumexp(comp) # mixture logits: nk
-        response = np.exp(comp - obs_logits[:, :, None]) # component responsibilities: nkm
+        response = np.exp(comp - obs_logits[:, :, None]) # softmaxed component responsibilities: nkm
         obs = np.exp(obs_logits)
 
         # state occupancy posterior
         loss, post, trans1, alpha = state_posterior(obs, init, trans)
-        if args.viz and step % 1 == 0:
+        if args.show and step % 1 == 0:
             decoded = dedup([symbol_list[state_chain[i]] for i in decode(obs, init, trans)])
             #print('decoded', decoded)
 
@@ -136,14 +139,16 @@ for step in range(args.steps):
             draw_alignment(ali, label, ax=axa, yloc=1.0)
             axa.set_title(f'ali {ali}')
 
-            axo.matshow(obs.T, aspect='auto')
+            axo.matshow(np.log(obs.T), aspect='auto')
+            axo.set_yticks(ticks=np.arange(len(label)), labels=label, fontsize=14)
+            draw_alignment(ali, label, ax=axo, yloc=1.0)
             axo.set_title('obs')
 
             plt.tight_layout()
             plt.show()
             plt.close(fig)
-        if step > 30:
-            trans = 0.99 * trans + 0.01 * trans1
+        #if step > 30:
+        #    trans = 0.99 * trans + 0.01 * trans1
 
         local_pi_c = np.sum(response * post[:, :, None] , axis=0)
         local_pi1 = local_pi_c / np.sum(post, axis=0)[:, None]
@@ -159,4 +164,5 @@ for step in range(args.steps):
     loss = agg_loss / len(args.key)
     print('step', step, 'loss', loss)
 
-np.save('exp/uber_pi.npy', uber_pi)
+if args.output:
+    np.save(args.output, uber_pi)
